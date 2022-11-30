@@ -1,5 +1,5 @@
 /////////// STATE MACHINE FUNCTIONS /////////////////
-void resetInterfaces(){
+void resetInterfaces() {
   Serial.println("Resetting the interfaces");
   Serial.println("Reset NB-IoT");
   NBIOTSerial.write("ATI9\r\n");
@@ -14,60 +14,77 @@ void resetInterfaces(){
   delay(200);
 }
 
-void setupNBIoTConnection(){
-  if (okList > NUM_SETUPOPERATIONS){
-    Serial.println("Ok list is greater");
-    setupNBIOTState = false;
-    slaveState = true;
-  }
-
-  if(nbIoToldState != okList){
-    cmd = strcat(setupIoTList[okList].c_str(), "\r\n");
-    Serial.println(cmd);
-    NBIOTSerial.write(cmd.c_str());
-  }
-  nbIoToldState = okList;
+void transmissionSM() {
+  Serial.println("Ready to transmit datagrams!");
   
-        // Serial.println(okList);
-      
+  Serial.write("AT+NUESTATS");
+  NBIOTSerial.write("AT+NUESTATS\r\n");
 }
 
-void setupBlueToothConnection(){
+void setupNBIoTConnection() {
+  // if operation is increased
+  if (nbIoToldState != okNBIOTList) {
+    if (okNBIOTList > NUM_SETUPOPERATIONS) {
+      if (okNBIOTList > NUM_SETUPOPERATIONS + 1) {
+        Serial.println("Setup done!");
+
+        setupNBIOTState = false;
+        transmissionState = true;
+        Serial.println(transmissionState);
+      }
+      else {
+        Serial.println("AT+NSOCR=\"DGRAM\",17,3365,1\r\n");
+        NBIOTSerial.write("AT+NSOCR=\"DGRAM\",17,3365,1\r\n");
+      }
+    } else {
+      cmd = strcat(setupIoTList[okNBIOTList].c_str(), "\r\n");
+      Serial.println(cmd);
+      NBIOTSerial.write(cmd.c_str());
+    }
+  }
+  nbIoToldState = okNBIOTList;
+}
+
+void setupBlueToothConnection() {
   Serial.println("Doing BLE setup operations");
 
+  if (BLEoldState != okBLEList) {
+
+
+  }
   Serial.println("AT+ROLE0");
   BLESerial.write("AT+ROLE0");  // set the role as slave
   delay(200);
   Serial.println("AT+IMME0");
-  BLESerial.write("AT+IMME0"); // 1 = Only on. Until AT + START, AT+CON, AT+CONNL commands is received. // 0: on and active to work -> IMME1 when needs to become central mode
+  BLESerial.write("AT+IMME0");  // 1 = Only on. Until AT + START, AT+CON, AT+CONNL commands is received. // 0: on and active to work -> IMME1 when needs to become central mode
   delay(200);
-  
+
   Serial.println(strcat("AT+NAME", BLENAME));
-  BLESerial.write(strcat("AT+NAME", BLENAME));  
-  //BLESerial.write(strcat("AT+PASS", 12345));  
+  BLESerial.write(strcat("AT+NAME", BLENAME));
+  //BLESerial.write(strcat("AT+PASS", 12345));
 
   delay(200);
   Serial.println("AT+AUTH1");
-  BLESerial.write("AT+AUTH1"); //1 auto , 0 not auto?
+  BLESerial.write("AT+AUTH1");  //1 auto , 0 not auto?
   delay(200);
   Serial.println("AT+NOTI1");
-  BLESerial.write("AT+NOTI1"); // Enable notifications (e.g. conn/disconn)
+  BLESerial.write("AT+NOTI1");  // Enable notifications (e.g. conn/disconn)
   delay(200);
   Serial.println("AT+NOTP1");
-  BLESerial.write("AT+NOTP1"); // Show also the address of the notification
+  BLESerial.write("AT+NOTP1");  // Show also the address of the notification
   delay(200);
   Serial.println("AT+ADTY0");
-  BLESerial.write("AT+ADTY0"); // 0 connectable advertising scanresponse // 1 and 2 not useful for us // 3 only advertising
+  BLESerial.write("AT+ADTY0");  // 0 connectable advertising scanresponse // 1 and 2 not useful for us // 3 only advertising
   delay(200);
   Serial.println("AT+BAUD0");
-  BLESerial.write("AT+BAUD0"); // 0 = 9600 baudAT+CHAR?
+  BLESerial.write("AT+BAUD0");  // 0 = 9600 baudAT+CHAR?
   delay(200);
   Serial.println("AT+ADVI1");
-  BLESerial.write("AT+ADVI1"); // speed of the transmission of the advertisements, 0 = 100ms F= 9000 ms
+  BLESerial.write("AT+ADVI1");  // speed of the transmission of the advertisements, 0 = 100ms F= 9000 ms
   //BLSSerial.write("AT+FLAG0"); // allow advertisements, should work even without the command
   delay(200);
   Serial.println("AT+SHOW3");
-  BLESerial.write("AT+SHOW3"); // in discovery: 1 only name, 2 only rssi, 3 both (3 is too much sometimes)
+  BLESerial.write("AT+SHOW3");  // in discovery: 1 only name, 2 only rssi, 3 both (3 is too much sometimes)
   delay(200);
   Serial.println("RESET!");
   BLESerial.write("AT+RESET");
@@ -75,7 +92,7 @@ void setupBlueToothConnection(){
   delay(200);
 
   BLESerial.write("AT+NAME?");
-  
+
   setupBLEState = false;
   setupNBIOTState = true;
 }

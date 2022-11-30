@@ -40,55 +40,36 @@ char *strremove(char *str, const char *sub) {
     return str;
 }
 
-void checkReset(){
-  if(strstr(outputNBIOT.c_str(), RESET_NBIOT_TAG)) {
-    Serial.println("NBIoT Reset done.");
-    resetState = false;
-    setupBLEState = true;
-  }
-}
-
-void checkOk(){
-  if(!resetState){
-    if(strstr(outputNBIOT.c_str(), "OK")){
-      Serial.println("Operation done, go with the next one");
-      okNBIOTList++;
-    }
-  }
-}
-
-void checkConnection(){
-  if(!resetState){
-    if(strstr(outputNBIOT.c_str(), "CEREG: 5")){
-      Serial.println("Connected!");
-      delay(200);
-      NBIOTSerial.write("AT+CGATT?\r\n");
-
-    }
-  }
-}
-
 void readNBIOT(){
   if(NBIOTSerial.available()){ 
     outputNBIOT=NBIOTSerial.readStringUntil('\n');
     Serial.println(outputNBIOT);
-    checkReset();
-    checkConnection();
-    checkOk();
+  }
+}
+
+
+void checkOkBLE(){
+  if(!resetState){
+    if(strstr(outputBLE.c_str(), "OK+Set")){
+      Serial.println("Operation ble done, go with the next one");
+      okBLEList++;
+    }
   }
 }
 
 void readBLE(){
   if (BLESerial.available()) {
-    String str = "";
+    // String outputBLE = "";
     Serial.print("HM10: ");
     
-    prevMillis = millis();
-    while (millis() - prevMillis < READ_TIME) {
-      if (BLESerial.available()) {
-        str += (char) BLESerial.read();
-      }
-    }
-    Serial.println(str);
+    outputBLE = BLESerial.readStringUntil('\n');
+    // prevMillis = millis();
+    // while (millis() - prevMillis < READ_TIME) {
+    //   if (BLESerial.available()) {
+    //     outputBLE += (char) BLESerial.read();
+    //   }
+    // }
+    Serial.println(outputBLE);
+    checkOkBLE();
   }  
 }

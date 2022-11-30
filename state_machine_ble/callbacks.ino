@@ -1,12 +1,12 @@
 /////////// STATE MACHINE CALLBACK FUNCTIONS /////////////////
 
 
-void onMaster() {
-  Serial.println("Doing the master");
-  delay(5000);
-  masterState = false;
-  transmissionState = true;
-}
+// void onMaster() {
+//   Serial.println("Doing the master");
+//   delay(5000);
+//   masterState = false;
+//   bleAdvState = true;
+// }
 
 void onEnter() {
   Serial.println("------------");
