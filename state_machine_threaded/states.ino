@@ -64,8 +64,8 @@ void setupBlueToothConnection() {
   //BLESerial.write(strcat("AT+PASS", 12345));
 
   delay(200);
-  Serial.println("AT+AUTH1");
-  BLESerial.write("AT+AUTH1");  //1 auto , 0 not auto?
+  // Serial.println("AT+AUTH1");
+  // BLESerial.write("AT+AUTH1");  //1 auto , 0 not auto?
   delay(200);
   Serial.println("AT+NOTI1");
   BLESerial.write("AT+NOTI1");  // Enable notifications (e.g. conn/disconn)

@@ -52,8 +52,18 @@ void checkOkBLE(){
   if(!resetState){
     if(strstr(outputBLE.c_str(), "OK+Set")){
       Serial.println("Operation ble done, go with the next one");
-      okBLEList++;
+      bleOperationIndex++;
     }
+  }
+}
+
+void checkResetBLE(){
+  if(strstr(outputBLE.c_str(), "OK+RESET")) {
+    Serial.println("BLE setup done.");
+    BLESerial.write("AT+NAME?");
+
+    setupBLEState = false;
+    bleAdvState = true;
   }
 }
 
@@ -71,5 +81,6 @@ void readBLE(){
     // }
     Serial.println(outputBLE);
     checkOkBLE();
+    checkResetBLE();
   }  
 }

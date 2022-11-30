@@ -17,31 +17,53 @@ void resetInterfaces() {
   setupBLEState = true;
 }
 
-// void transmissionSM() {
-//   Serial.println("Ready to transmit datagrams!");
-  
-//   Serial.write("AT+NUESTATS");
-//   NBIOTSerial.write("AT+NUESTATS\r\n");
-// }
+void onMaster() {
+  if (bleOperationIndex < NUM_MASTEROPERATIONS_BLE) {
+    if (oldStateBle != bleOperationIndex) { //master operations
+      cmd_ble = masterBLEList[bleOperationIndex];
+      Serial.println(cmd_ble);
+      BLESerial.write(cmd_ble.c_str());
+      oldStateBle = bleOperationIndex;
+    }
 
-void bleAdvertisement(){
-  // Serial.println("Sending advertisements");
+  } 
+}
 
-  // while(true){
-  // Serial.println("Advertisements");
-  // delay(500);
-  // }
+void bleAdvertisement() {
+  // reset states for master list oprations
+  oldStateBle = -1;
+  bleOperationIndex = 0;
+  for (int i = 0; i < 5; i++) {
+    Serial.println("Advertisements");
+    delay(500);
+  }
 
-
+  bleAdvState = false;
+  bleMasterState = true;
 }
 
 void setupBlueToothConnection() {
-  Serial.println("Doing BLE setup operations");
+  if (oldStateBle != bleOperationIndex) {
+    if (bleOperationIndex < NUM_SETUPOPERATIONS_BLE) {  //Ordinary operations
+      cmd_ble = setupBLEList[bleOperationIndex];
+      Serial.println(cmd_ble);
+      BLESerial.write(cmd_ble.c_str());
+      oldStateBle = bleOperationIndex;
+    } else {
+      // delay(200);
+      // Serial.println("RESET!");
+      // BLESerial.write("AT+RESET");
 
-  if (BLEoldState != okBLEList) {
+      // delay(200);
 
+      // BLESerial.write("AT+NAME?");
 
+      // setupBLEState = false;
+      // bleAdvState = true;
+    }
   }
+
+
   // Serial.println("AT+ROLE0");
   // BLESerial.write("AT+ROLE0");  // set the role as slave
   // delay(200);
@@ -75,14 +97,4 @@ void setupBlueToothConnection() {
   // delay(200);
   // Serial.println("AT+SHOW3");
   // BLESerial.write("AT+SHOW3");  // in discovery: 1 only name, 2 only rssi, 3 both (3 is too much sometimes)
-  delay(200);
-  Serial.println("RESET!");
-  BLESerial.write("AT+RESET");
-
-  delay(200);
-
-  BLESerial.write("AT+NAME?");
-
-  setupBLEState = false;
-  bleAdvState = true;
 }
