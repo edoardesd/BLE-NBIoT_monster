@@ -25,22 +25,48 @@ void onMaster() {
       BLESerial.write(cmd_ble.c_str());
       oldStateBle = bleOperationIndex;
     }
-
   } 
 }
 
-void bleAdvertisement() {
+void bleAdvertisement_9() {
+  Serial.println("------------");
+  Serial.print(F("Enter in: "));
+  Serial.println(stateMachine.ActiveStateName());
   // reset states for master list oprations
-  oldStateBle = -1;
-  bleOperationIndex = 0;
-  for (int i = 0; i < 5; i++) {
-    Serial.println("Advertisements");
-    delay(500);
-  }
+  // oldStateBle = -1;
+  // bleOperationIndex = 0;
+  // for (int i = 0; i < 6; i++) {
+  //   Serial.println("Advertisements every 152ms");
+  //   delay(10000);
+  // }
 
-  bleAdvState = false;
-  bleMasterState = true;
+  BLESerial.write("AT+ADVI9");
+  delay(200);
+  BLESerial.write("AT+RESET");
+  delay(200);
 }
+
+void bleAdvertisement_D() {
+  Serial.println("------------");
+  Serial.print(F("Enter in: "));
+  Serial.println(stateMachine.ActiveStateName());
+  // for (int i = 0; i < 6; i++) {
+  //   Serial.println("Advertisements every 1285ms");
+  //   delay(10000);
+  // }
+
+  BLESerial.write("AT+ADVID");
+  delay(200);
+  BLESerial.write("AT+RESET");
+  delay(200);
+  // bleAdv_9State = false;
+  // bleAdv_DState = true;
+
+}
+// void bleAdvertisement_D() {
+  
+// }
+
 
 void setupBlueToothConnection() {
   if (oldStateBle != bleOperationIndex) {

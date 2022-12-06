@@ -62,8 +62,10 @@ void checkResetBLE(){
     Serial.println("BLE setup done.");
     BLESerial.write("AT+NAME?");
 
+  if(strstr(stateMachine.ActiveStateName(), "SETUP_BLE")){
     setupBLEState = false;
     bleAdvState = true;
+    }
   }
 }
 
