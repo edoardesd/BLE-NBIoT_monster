@@ -66,25 +66,56 @@ void checkResetBLE(){
     bleOperationIndex = 0;
     oldStateBle = -1;
     setupBLEState = false;
-    bleAdvState = true;
+    bleMasterState = true;
     }
   }
 }
 
+void checkDiscovery(){
+  char mac[13];
+  char *mac_start;
+  int index;
+
+  if(strstr(outputBLE.c_str(), "OK+DIS")){
+    mac_start = strchr(outputBLE.c_str(), ':');
+    index = (int)(mac_start - outputBLE.c_str()+1);
+    strncpy(mac, &outputBLE.c_str()[index], 12);
+    mac[12]='\0';
+    Serial.println(mac);
+
+    if( strstr(mac, MAC_TO_CONNECT)){
+      Serial.println("MAC ADDRESS FOUND, start the connect!");
+      // BLESerial.write(strcat("AT+CON", MAC_TO_CONNECT);
+    }
+
+  }
+
+  if(strstr(outputBLE.c_str(), "OK+DISCE")){
+    BLESerial.write(strcat("AT+CON", MAC_TO_CONNECT));
+  }
+}
+
+void checkConnection(){
+  if(strstr(outputBLE.c_str(), "OK+CONNA")){
+    Serial.println("Connected!");
+    bleMasterState = false;
+    bleConnectedState = true;
+
+
+  }
+}
 void readBLE(){
   if (BLESerial.available()) {
-    // String outputBLE = "";
     Serial.print("HM10: ");
     
     outputBLE = BLESerial.readStringUntil('\n');
-    // prevMillis = millis();
-    // while (millis() - prevMillis < READ_TIME) {
-    //   if (BLESerial.available()) {
-    //     outputBLE += (char) BLESerial.read();
-    //   }
-    // }
     Serial.println(outputBLE);
     checkOkBLE();
     checkResetBLE();
+
+    if(strstr(stateMachine.ActiveStateName(), "BLE_MASTER")){
+      checkDiscovery();
+      checkConnection();
+    }
   }  
 }
