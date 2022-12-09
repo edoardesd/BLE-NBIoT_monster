@@ -29,22 +29,48 @@ void onMaster() {
 }
 
 void bleConnected() {
-  String message = "";
-
-  for (int i = 0; i < 200; i++) {
-    message = message + "0";
+  for (int i = 0; i < 10; i++) {
+    Serial.print("Sending: ");
+    Serial.println(message);
+    BLESerial.write(message);
+    delay(100);
   }
 
-  Serial.print("Sending: ");
-  Serial.println(message);
-  BLESerial.write(message.c_str());
 
   bleTransmissions++;
 
-  if(bleTransmissions > 4){
+
+}
+
+void inTransmission(){
+    Serial.println(bleTransmissions);
+  if(bleTransmissions > 0){
+    Serial.println("ENTERED IN THIS FUCKING");
     bleConnectedState = false;
-    bleMasterState = true;
+    bleDisconnectionState = true;
   }
+}
+
+void bleDisconnection(){
+  if (oldStateBle != bleOperationIndex) {
+    if (bleOperationIndex < NUM_DISCONNOPERATIONS_BLE) {  //Ordinary operations
+      cmd_ble = disconnectionBLEList[bleOperationIndex];
+      Serial.println(cmd_ble);
+      BLESerial.write(cmd_ble.c_str());
+      oldStateBle = bleOperationIndex;
+    }
+    else{
+
+  // Serial.println("disconnecting");
+  // BLESerial.write("AT");
+    bleTransmissions = 0;
+    bleOperationIndex = 0;
+    oldStateBle = -1;
+    bleDisconnectionState = false;
+    bleAdvState = true;
+  }
+  }
+  
 }
 
 

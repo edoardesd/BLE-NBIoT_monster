@@ -57,6 +57,15 @@ void checkOkBLE(){
   }
 }
 
+void checkDisconnBLE(){
+  if(!resetState){
+    if(strstr(outputBLE.c_str(), "OK+LOST")){
+      Serial.println("BLE DISCONNECTED, go with the next one");
+      bleOperationIndex++;
+    }
+  }
+}
+
 void checkResetBLE(){
   if(strstr(outputBLE.c_str(), "OK+RESET")) {
     Serial.println("BLE setup done.");
@@ -98,6 +107,8 @@ void checkDiscovery(){
 void checkConnection(){
   if(strstr(outputBLE.c_str(), "OK+CONNA")){
     Serial.println("Connected!");
+    bleOperationIndex = 0;
+    oldStateBle = -1;
     bleMasterState = false;
     bleConnectedState = true;
 
@@ -112,6 +123,11 @@ void readBLE(){
     Serial.println(outputBLE);
     checkOkBLE();
     checkResetBLE();
+
+    if(strstr(stateMachine.ActiveStateName(), "BLE_DISCONNECTION")){
+      
+      checkDisconnBLE();
+    }
 
     if(strstr(stateMachine.ActiveStateName(), "BLE_MASTER")){
       checkDiscovery();
