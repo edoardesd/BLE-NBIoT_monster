@@ -10,8 +10,8 @@
 #define NUM_MASTEROPERATIONS_BLE 4
 #define NUM_DISCONNOPERATIONS_BLE 6
 #define MAC_TO_CONNECT "A06C65CF6E62"
-#define CONNECTION_TIME 30000
-#define NUM_BLE_MESSAGES 0
+#define CONNECTION_TIME 10000
+#define NUM_BLE_MESSAGES 4
 
 
 const char *BLE_TAG = "BLE+";
@@ -80,12 +80,12 @@ void setupStateMachine() {
   stateMachine.AddState(stateName[RESET], resetInterfaces, nullptr, onExit);
   stateMachine.AddState(stateName[SETUP_BLE], onEnter, setupBlueToothConnection, onExit);
   // stateMachine.AddState(stateName[NBIOT_TRANSMISSION], transmissionSM, nullptr, onExit);
-  stateMachine.AddState(stateName[BLE_ADV], ADV_TIME, onEnter, nullptr, onExit);
-  // stateMachine.AddState(stateName[BLE_ADV_9], ADV_TIME, bleAdvertisement_9, nullptr, onExit);
-  // stateMachine.AddState(stateName[BLE_ADV_D], ADV_TIME, bleAdvertisement_D, nullptr, onExit);
-  // stateMachine.AddState(stateName[BLE_ADV], onEnter, bleAdvertisement, onExit);
+  // stateMachine.AddState(stateName[BLE_ADV], ADV_TIME, onEnter, nullptr, onExit);
+  stateMachine.AddState(stateName[BLE_ADV_9], ADV_TIME, bleAdvertisement_9, nullptr, onExit);
+  stateMachine.AddState(stateName[BLE_ADV_D], ADV_TIME, bleAdvertisement_D, nullptr, onExit);
+  stateMachine.AddState(stateName[BLE_ADV], onEnter, bleAdvertisement, onExit);
   stateMachine.AddState(stateName[BLE_MASTER], onEnter, onMaster, onExit);
-  stateMachine.AddState(stateName[BLE_CONNECTED], bleConnected, inTransmission, onExit);
+  stateMachine.AddState(stateName[BLE_CONNECTED], CONNECTION_TIME, bleConnected, inTransmission, onExit);
   stateMachine.AddState(stateName[BLE_DISCONNECTION], onEnter, bleDisconnection, onExit);
 
   // bool val at true activate the transition
@@ -101,7 +101,7 @@ void setupStateMachine() {
   stateMachine.AddTransition(BLE_MASTER, BLE_CONNECTED, bleConnectedState);
   stateMachine.AddTransition(BLE_CONNECTED, BLE_DISCONNECTION, bleDisconnectionState);
   stateMachine.AddTransition(BLE_DISCONNECTION, BLE_ADV, bleAdvState);
-  // stateMachine.AddTimedTransition(BLE_CONNECTED, BLE_CONNECTED);
+  stateMachine.AddTimedTransition(BLE_CONNECTED, BLE_CONNECTED);
   // stateMachine.AddTransition(BLE_CONNECTED, BLE_MASTER, bleMasterState);
   stateMachine.AddTransition(INIT, RESET, resetState);
 }

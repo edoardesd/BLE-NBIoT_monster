@@ -1,8 +1,4 @@
 /////////// STATE MACHINE CALLBACK FUNCTIONS /////////////////
-
-
-
-
 void onEnter() {
   Serial.println("------------");
   Serial.print(F("Enter in: "));

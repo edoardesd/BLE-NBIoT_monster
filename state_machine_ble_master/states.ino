@@ -36,41 +36,31 @@ void bleConnected() {
     delay(100);
   }
 
-
   bleTransmissions++;
-
-
 }
 
-void inTransmission(){
-    Serial.println(bleTransmissions);
-  if(bleTransmissions > 0){
-    Serial.println("ENTERED IN THIS FUCKING");
+void inTransmission() {
+  if (bleTransmissions > NUM_BLE_MESSAGES - 1) {
     bleConnectedState = false;
     bleDisconnectionState = true;
   }
 }
 
-void bleDisconnection(){
+void bleDisconnection() {
   if (oldStateBle != bleOperationIndex) {
     if (bleOperationIndex < NUM_DISCONNOPERATIONS_BLE) {  //Ordinary operations
       cmd_ble = disconnectionBLEList[bleOperationIndex];
       Serial.println(cmd_ble);
       BLESerial.write(cmd_ble.c_str());
       oldStateBle = bleOperationIndex;
+    } else {
+      bleTransmissions = 0;
+      bleOperationIndex = 0;
+      oldStateBle = -1;
+      bleDisconnectionState = false;
+      bleAdvState = true;
     }
-    else{
-
-  // Serial.println("disconnecting");
-  // BLESerial.write("AT");
-    bleTransmissions = 0;
-    bleOperationIndex = 0;
-    oldStateBle = -1;
-    bleDisconnectionState = false;
-    bleAdvState = true;
   }
-  }
-  
 }
 
 
