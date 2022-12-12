@@ -80,10 +80,10 @@ void setupStateMachine() {
   stateMachine.AddState(stateName[RESET], resetInterfaces, nullptr, onExit);
   stateMachine.AddState(stateName[SETUP_BLE], onEnter, setupBlueToothConnection, onExit);
   // stateMachine.AddState(stateName[NBIOT_TRANSMISSION], transmissionSM, nullptr, onExit);
-  // stateMachine.AddState(stateName[BLE_ADV], ADV_TIME, onEnter, nullptr, onExit);
-  stateMachine.AddState(stateName[BLE_ADV_9], ADV_TIME, bleAdvertisement_9, nullptr, onExit);
-  stateMachine.AddState(stateName[BLE_ADV_D], ADV_TIME, bleAdvertisement_D, nullptr, onExit);
-  stateMachine.AddState(stateName[BLE_ADV], onEnter, bleAdvertisement, onExit);
+  stateMachine.AddState(stateName[BLE_ADV], ADV_TIME, onEnter, nullptr, onExit);
+  // stateMachine.AddState(stateName[BLE_ADV_9], ADV_TIME, bleAdvertisement_9, nullptr, onExit);
+  // stateMachine.AddState(stateName[BLE_ADV_D], ADV_TIME, bleAdvertisement_D, nullptr, onExit);
+  // stateMachine.AddState(stateName[BLE_ADV], onEnter, bleAdvertisement, onExit);
   stateMachine.AddState(stateName[BLE_MASTER], onEnter, onMaster, onExit);
   stateMachine.AddState(stateName[BLE_CONNECTED], CONNECTION_TIME, bleConnected, inTransmission, onExit);
   stateMachine.AddState(stateName[BLE_DISCONNECTION], onEnter, bleDisconnection, onExit);

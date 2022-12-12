@@ -19,26 +19,78 @@ void resetInterfaces() {
 
 void onMaster() {
   if (bleOperationIndex < NUM_MASTEROPERATIONS_BLE) {
-    if (oldStateBle != bleOperationIndex) { //master operations
+    if (oldStateBle != bleOperationIndex) {  //master operations
       cmd_ble = masterBLEList[bleOperationIndex];
       Serial.println(cmd_ble);
       BLESerial.write(cmd_ble.c_str());
       oldStateBle = bleOperationIndex;
     }
-  } 
+  }
+}
+
+void bleConnected() {
+  onEnter();
+  for (int i = 0; i < 10; i++) {
+    Serial.print("Sending: ");
+    Serial.println(message);
+    BLESerial.write(message);
+    delay(100);
+  }
+  bleOperationIndex = 0;
+  oldStateBle = -1;
+  bleTransmissions++;
+}
+
+void inTransmission() {
+
+  while (bleTransmissions < NUM_BLE_MESSAGES) {
+    for (int i = 0; i < 10; i++) {
+      Serial.print("Sending: ");
+      Serial.println(message);
+      BLESerial.write(message);
+      delay(100);
+    }
+
+    Serial.print("loop: ");
+    Serial.println(bleTransmissions);
+    bleTransmissions++;
+    delay(5000);
+  }
+
+  // if (bleTransmissions > NUM_BLE_MESSAGES - 1) {
+  bleConnectedState = false;
+  bleDisconnectionState = true;
+  bleAdvState = false;
+  // }
+  // bleConnectedState = false;
+  //   bleDisconnectionState = true;
+  //   bleAdvState = false;
+}
+
+void bleDisconnection() {
+  if (oldStateBle != bleOperationIndex) {
+    if (bleOperationIndex < NUM_DISCONNOPERATIONS_BLE) {  //Ordinary operations
+      cmd_ble = disconnectionBLEList[bleOperationIndex];
+      Serial.println(cmd_ble);
+      BLESerial.write(cmd_ble.c_str());
+      oldStateBle = bleOperationIndex;
+    } else {
+      bleTransmissions = 0;
+      bleOperationIndex = 0;
+      oldStateBle = -1;
+      bleDisconnectionState = false;
+      bleAdvState = true;
+    }
+  }
 }
 
 void bleAdvertisement_9() {
   Serial.println("------------");
   Serial.print(F("Enter in: "));
   Serial.println(stateMachine.ActiveStateName());
-  // reset states for master list oprations
-  // oldStateBle = -1;
-  // bleOperationIndex = 0;
-  // for (int i = 0; i < 6; i++) {
-  //   Serial.println("Advertisements every 152ms");
-  //   delay(10000);
-  // }
+
+  bleOperationIndex = 0;
+  oldStateBle = -1;
 
   BLESerial.write("AT+ADVI9");
   delay(200);
@@ -50,22 +102,15 @@ void bleAdvertisement_D() {
   Serial.println("------------");
   Serial.print(F("Enter in: "));
   Serial.println(stateMachine.ActiveStateName());
-  // for (int i = 0; i < 6; i++) {
-  //   Serial.println("Advertisements every 1285ms");
-  //   delay(10000);
-  // }
+
+  bleOperationIndex = 0;
+  oldStateBle = -1;
 
   BLESerial.write("AT+ADVID");
   delay(200);
   BLESerial.write("AT+RESET");
   delay(200);
-  // bleAdv_9State = false;
-  // bleAdv_DState = true;
-
 }
-// void bleAdvertisement_D() {
-  
-// }
 
 
 void setupBlueToothConnection() {
