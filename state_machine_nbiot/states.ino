@@ -5,13 +5,49 @@ void resetInterfaces() {
   NBIOTSerial.write("ATI9\r\n");
   NBIOTSerial.write("AT+NRB\r\n");
   delay(200);
+  // TRANScmd = strcat(TRANScmd.c_str(), IP_ADDR);
+  // TRANScmd = strcat(TRANScmd.c_str(), ",");
+  // TRANScmd = strcat(TRANScmd.c_str(), PORT);
+  // TRANScmd = strcat(TRANScmd.c_str(), ",");
+  // TRANScmd = strcat(TRANScmd.c_str(), "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+  // TRANScmd = strcat(TRANScmd.c_str(), ",");
+  // TRANScmd = strcat(TRANScmd.c_str(), "200");
+  // TRANScmd = strcat(TRANScmd.c_str(), "\r\n");
+
+  // Serial.println(TRANScmd);
 }
 
-void transmissionSM() {
-  Serial.println("Ready to transmit datagrams!");
+void readStats() {
+  NBIOTSerial.write(STATScmd.c_str());
+}
 
-  Serial.write("AT+NUESTATS");
-  NBIOTSerial.write("AT+NUESTATS\r\n");
+void sendDatagram(){
+  Serial.println("Ready to transmit datagrams!");
+  previousMillis = millis();
+
+}
+
+void waitNextTransmission(){
+
+if (millis() - messagePreviousMillis >= 200) {
+  if (msg_counter<NUM_MESSAGES_NBIOT){
+    Serial.print("Send message number :");
+    Serial.println(msg_counter);
+    NBIOTSerial.write(TRANScmd.c_str());
+    msg_counter++;
+    messagePreviousMillis = millis();
+  }
+}  
+
+
+  if (millis() - previousMillis >= BURST_MESSAGE_NBIOT) {
+    previousMillis = millis();
+
+    Serial.println("Waited enough");
+    transState = false;
+    statsState = true;
+    msg_counter = 0;
+    }
 }
 
 void setupNBIoTConnection() {
@@ -23,36 +59,18 @@ void setupNBIoTConnection() {
       NBIOTSerial.write(cmd.c_str());
     }
     if (okNBIOTList == NUM_SETUPOPERATIONS + 1) {
-      Serial.println("AT+NSOCR=\"DGRAM\",17,3365,1\r\n");
-      NBIOTSerial.write("AT+NSOCR=\"DGRAM\",17,3365,1\r\n");
+      Serial.println(DGRAMcmd);
+      NBIOTSerial.write(DGRAMcmd.c_str());
     }
 
     if (okNBIOTList == NUM_SETUPOPERATIONS + 2) {
       Serial.println("Socket done! Change state");
+      
       setupNBIOTState = false;
-      transmissionState = true;
+      statsState = true;
     }
     // Serial.print(okNBIOTList);
     // Serial.println(NUM_SETUPOPERATIONS);
   }
   nbIoToldState = okNBIOTList;
 }
-
-// if (okNBIOTList > NUM_SETUPOPERATIONS) {
-//       if (okNBIOTList > NUM_SETUPOPERATIONS + 1) {
-//         Serial.println("Setup done!");
-
-//         setupNBIOTState = false;
-//         // transmissionState = true;
-//         Serial.println(transmissionState);
-//       }
-//       else {
-//         Serial.println("AT+NSOCR=\"DGRAM\",17,3365,1\r\n");
-//         NBIOTSerial.write("AT+NSOCR=\"DGRAM\",17,3365,1\r\n");
-//       }
-//     } else {
-//       cmd = strcat(setupIoTList[okNBIOTList].c_str(), "\r\n");
-//       Serial.println(cmd);
-//       NBIOTSerial.write(cmd.c_str());
-//     }
-//   }
