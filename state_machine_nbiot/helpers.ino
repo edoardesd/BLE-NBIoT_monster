@@ -80,25 +80,67 @@ void checkRSSI() {
       Serial.print("RSRQ: ");
       Serial.println(rsrqInt);
       if (idDatagram < 10){
-        stringIdDatagram = "00" + idDatagram;
+        stringIdDatagram = "00" + String(idDatagram);
       }
       if (idDatagram >= 10 && idDatagram < 100){
-        stringIdDatagram = "0" + idDatagram;
+        stringIdDatagram = "0" + String(idDatagram);
       }
       if (idDatagram >=100 && idDatagram < 1000){
-        stringIdDatagram = idDatagram;
+        stringIdDatagram = String(idDatagram);
       }
-      remainingPayload = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+      remainingPayload = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
+      
       payload = stringIdDatagram + "A" + rsrqInt + remainingPayload;
-      Serial.println(payload);
-      TRANScmd = "AT+NSOST=0,\"131.175.120.22\",8883," + String(payload.length()/2) + ",\"";
-      TRANScmd = strcat(TRANScmd.c_str(), payload.c_str());
+      char payloadChar[payload.length()+1];
+      strcpy(payloadChar, payload.c_str());
+      Serial.println(payloadChar);
+      char payloadHex[100];
+      int len = strlen(payloadChar);
+
+
+      for (int i = 0, j = 0; i < len; ++i, j += 2){
+        sprintf(payloadHex + j, "%02x", payloadChar[i] & 0xff);
+      }
+
+      Serial.println(payloadHex);
+
+
+      BYTE byteArr[len];
+
+      string2ByteArray(payloadChar, byteArr);
+
+
+      Serial.println("byte array is...");
+      for(int i=0; i<len; i++)
+      {
+          Serial.print(payloadChar[i] +"-"+ byteArr[i]);
+      }
+      Serial.println("\n");
+
+      //converting string to BYTE[]
+
+      TRANScmd = "AT+NSOST=0,\"131.175.120.22\",8883," + String(len) + ",\"";
+      TRANScmd = strcat(TRANScmd.c_str(), payloadHex);
       TRANScmd = strcat(TRANScmd.c_str(), "\"\r\n");
       // TRANScmd = TRANScmd_mid + TRANScmd_secondHalf;
       Serial.println(TRANScmd);
     }
   }
+}
+
+void string2ByteArray(char* input, BYTE* output)
+{
+    int loop;
+    int i;
+    
+    loop = 0;
+    i = 0;
+    
+    while(input[loop] != '\0')
+    {
+        output[i++] = input[loop++];
+    }
 }
 
 void readNBIOT() {

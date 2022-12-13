@@ -6,8 +6,10 @@
 #define powerPin 7 
 #define BLENAME "meter0"
 #define NUM_SETUPOPERATIONS 5
-#define BURST_MESSAGE_NBIOT 120000
+#define BURST_MESSAGE_NBIOT 10000
 #define NUM_MESSAGES_NBIOT 3
+
+typedef unsigned char BYTE;
 
 const char *IP_ADDR = "131.175.120.22";
 const char *PORT = "8883";

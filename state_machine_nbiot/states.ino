@@ -22,6 +22,7 @@ void readStats() {
 }
 
 void sendDatagram(){
+  idDatagram++;
   Serial.println("Ready to transmit datagrams!");
   previousMillis = millis();
 
