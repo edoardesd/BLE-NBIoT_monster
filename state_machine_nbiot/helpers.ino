@@ -53,9 +53,9 @@ void checkOk() {
     if (strstr(outputNBIOT.c_str(), SUCCESS_NBIOT_TAG)) {
       // Serial.println("Operation done, go with the next one");
       okNBIOTList++;
-      if(statsState){
+      if (statsState) {
         statsState = false;
-        transState = true;        
+        transState = true;
       }
     }
   }
@@ -71,76 +71,117 @@ void checkConnection() {
   }
 }
 
+void createMessage() {
+  if (idDatagram < 10) {
+    stringIdDatagram = "00" + String(idDatagram);
+  }
+  if (idDatagram >= 10 && idDatagram < 100) {
+    stringIdDatagram = "0" + String(idDatagram);
+  }
+  if (idDatagram >= 100 && idDatagram < 1000) {
+    stringIdDatagram = String(idDatagram);
+  }
+
+  strcat(payload, stringIdDatagram.c_str());
+  Serial.println(payload);
+
+  strcat(payload, "A");
+  Serial.println(payload);
+
+  strcat(payload, rsrq);
+
+
+
+  Serial.println(payload);
+
+  strcat(payload, remainingPayload);
+  strcat(payload, remainingPayload);
+
+  Serial.println(payload);
+
+  int len = strlen(payload);
+
+  for (int i = 0, j = 0; i < len; ++i, j += 2) {
+    sprintf(payloadHex + j, "%02x", payload[i] & 0xff);
+  }
+
+  Serial.println(payloadHex);
+
+  strcat(TRANScmd, "AT+NSOST=0,\"131.175.120.22\",8883,");
+  snprintf(buffer, sizeof(buffer), "%d", len);
+  strcat(TRANScmd, buffer);
+  strcat(TRANScmd, ",\"");
+  strcat(TRANScmd, payloadHex);
+  strcat(TRANScmd, "\"\r\n");
+}
+
 void checkRSSI() {
   if (!resetState) {
     if (strstr(outputNBIOT.c_str(), "RSRQ")) {
-      rsrq = strremove(outputNBIOT.c_str(), "\"RSRQ\",-");
-      int rsrqInt = rsrq.toInt();
+      strcpy(rsrq, strremove(strremove(outputNBIOT.c_str(), "\"RSRQ\",-"), "\r"));
+      // int rsrqInt = rsrq.toInt();
 
-      Serial.print("RSRQ: ");
-      Serial.println(rsrqInt);
-      if (idDatagram < 10){
-        stringIdDatagram = "00" + String(idDatagram);
-      }
-      if (idDatagram >= 10 && idDatagram < 100){
-        stringIdDatagram = "0" + String(idDatagram);
-      }
-      if (idDatagram >=100 && idDatagram < 1000){
-        stringIdDatagram = String(idDatagram);
-      }
-      remainingPayload = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-
-      
-      payload = stringIdDatagram + "A" + rsrqInt + remainingPayload;
-      char payloadChar[payload.length()+1];
-      strcpy(payloadChar, payload.c_str());
-      Serial.println(payloadChar);
-      char payloadHex[100];
-      int len = strlen(payloadChar);
+      memset(payload, 0, sizeof payload);
+      memset(TRANScmd, 0, sizeof TRANScmd);
 
 
-      for (int i = 0, j = 0; i < len; ++i, j += 2){
-        sprintf(payloadHex + j, "%02x", payloadChar[i] & 0xff);
-      }
-
-      Serial.println(payloadHex);
+      // Serial.print("RSRQ: ");
+      // Serial.println(rsrqInt);
 
 
-      BYTE byteArr[len];
-
-      string2ByteArray(payloadChar, byteArr);
 
 
-      Serial.println("byte array is...");
-      for(int i=0; i<len; i++)
-      {
-          Serial.print(payloadChar[i] +"-"+ byteArr[i]);
-      }
-      Serial.println("\n");
+      createMessage();
+        // Serial.println(buffer);
+        // strcat(payload, stringIdDatagram.c_str());
+        // Serial.println(payload);
 
-      //converting string to BYTE[]
+        // strcat(payload, "A");
+        // Serial.println(payload);
 
-      TRANScmd = "AT+NSOST=0,\"131.175.120.22\",8883," + String(len) + ",\"";
-      TRANScmd = strcat(TRANScmd.c_str(), payloadHex);
-      TRANScmd = strcat(TRANScmd.c_str(), "\"\r\n");
-      // TRANScmd = TRANScmd_mid + TRANScmd_secondHalf;
+        // // snprintf(buffer, sizeof(buffer), "%d", rsrqInt);
+        // strcat(payload, rsrq);
+
+
+
+        // Serial.println(payload);
+
+        // strcat(payload, remainingPayload);
+        // strcat(payload, remainingPayload);
+        // // strcat(payload, remainingPayload);
+        // // strcat(payload, "A");
+        // // strcat(payload, remainingPayload);
+        // Serial.println(payload);
+
+
+        // //payload = stringIdDatagram + "A" + rsrqInt + remainingPayload;
+        // //char payloadChar[strlen(payload)+1];
+        // //strcpy(payloadChar, payload);
+        // //Serial.println(payloadChar);
+        // int len = strlen(payload);
+
+        // for (int i = 0, j = 0; i < len; ++i, j += 2){
+        //   sprintf(payloadHex + j, "%02x", payload[i] & 0xff);
+        // }
+
+        // Serial.println(payloadHex);
+
+        // strcat(TRANScmd, "AT+NSOST=0,\"131.175.120.22\",8883,");
+        // snprintf(buffer, sizeof(buffer), "%d", len);
+        // strcat(TRANScmd, buffer);
+        // strcat(TRANScmd, ",\"");
+        // strcat(TRANScmd, payloadHex);
+        // strcat(TRANScmd, "\"\r\n");
+
+
+        // TRANScmd = "AT+NSOST=0,\"131.175.120.22\",8883," + String(len) + ",\"";
+        // TRANScmd = strcat(TRANScmd.c_str(), payloadHex);
+        // TRANScmd = strcat(TRANScmd.c_str(), "\"\r\n");
+        // TRANScmd = TRANScmd_mid + TRANScmd_secondHalf;
+        Serial.println();
       Serial.println(TRANScmd);
     }
   }
-}
-
-void string2ByteArray(char* input, BYTE* output)
-{
-    int loop;
-    int i;
-    
-    loop = 0;
-    i = 0;
-    
-    while(input[loop] != '\0')
-    {
-        output[i++] = input[loop++];
-    }
 }
 
 void readNBIOT() {

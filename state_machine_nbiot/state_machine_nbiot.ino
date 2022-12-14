@@ -6,8 +6,9 @@
 #define powerPin 7 
 #define BLENAME "meter0"
 #define NUM_SETUPOPERATIONS 5
-#define BURST_MESSAGE_NBIOT 10000
-#define NUM_MESSAGES_NBIOT 3
+#define BURST_MESSAGE_NBIOT 60000
+#define NUM_MESSAGES_NBIOT 50
+#define MSG_DELAY 300
 
 typedef unsigned char BYTE;
 
@@ -34,7 +35,6 @@ int okNBIOTList = 0;
 int okBLEList = 0;
 int nbIoToldState = -1;
 int BLEoldState = -1;
-String rsrq = "";
 int msg_counter = 0;
 
 
@@ -45,17 +45,14 @@ String setupIoTList[NUM_SETUPOPERATIONS] = {"AT+CMEE=1", "AT+CFUN=1", "AT+CGDCON
 String DGRAMcmd = "AT+NSOCR=\"DGRAM\",17,3365,1\r\n";
 String STATScmd = "AT+NUESTATS\r\n";
 String CGATTcmd = "AT+CGATT?\r\n";
-// String TRANScmd = "AT+NSOST=0,\"131.175.120.22\",8883,200,\"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\"\r\n";
-String TRANScmd_firstHalf = "AT+NSOST=0,\"131.175.120.22\",8883,";
-String TRANScmd_secondHalf = "-0000\"\\r\\n";
-String TRANScmd_finalPart = "\"\\r\\n";
-String TRANScmd = "";
-String TRANScmd_mid = "";
-String payload = "";
+char rsrq[5] = "";
+char TRANScmd[250] = "";
+char remainingPayload[49] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+char payload[220] = "";
+char buffer[5] = "";
+char payloadHex[220];
 int idDatagram = 0;
 String stringIdDatagram = "";
-String remainingPayload = "";
-
 String cmd;
 
 char *strremove(char *str, const char *sub);

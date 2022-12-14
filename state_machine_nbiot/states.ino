@@ -5,16 +5,6 @@ void resetInterfaces() {
   NBIOTSerial.write("ATI9\r\n");
   NBIOTSerial.write("AT+NRB\r\n");
   delay(200);
-  // TRANScmd = strcat(TRANScmd.c_str(), IP_ADDR);
-  // TRANScmd = strcat(TRANScmd.c_str(), ",");
-  // TRANScmd = strcat(TRANScmd.c_str(), PORT);
-  // TRANScmd = strcat(TRANScmd.c_str(), ",");
-  // TRANScmd = strcat(TRANScmd.c_str(), "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
-  // TRANScmd = strcat(TRANScmd.c_str(), ",");
-  // TRANScmd = strcat(TRANScmd.c_str(), "200");
-  // TRANScmd = strcat(TRANScmd.c_str(), "\r\n");
-
-  // Serial.println(TRANScmd);
 }
 
 void readStats() {
@@ -30,11 +20,11 @@ void sendDatagram(){
 
 void waitNextTransmission(){
 
-if (millis() - messagePreviousMillis >= 200) {
+if (millis() - messagePreviousMillis >= MSG_DELAY) {
   if (msg_counter<NUM_MESSAGES_NBIOT){
     Serial.print("Send message number :");
     Serial.println(msg_counter);
-    NBIOTSerial.write(TRANScmd.c_str());
+    NBIOTSerial.write(TRANScmd);
     msg_counter++;
     messagePreviousMillis = millis();
   }
