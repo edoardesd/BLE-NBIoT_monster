@@ -6,7 +6,7 @@
 #define powerPin 7 
 #define BLENAME "meter0"
 #define NUM_SETUPOPERATIONS 5
-#define BURST_MESSAGE_NBIOT 60000
+#define BURST_MESSAGE_NBIOT 300000
 #define NUM_MESSAGES_NBIOT 50
 #define MSG_DELAY 300
 

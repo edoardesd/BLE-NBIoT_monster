@@ -6,24 +6,30 @@ void resetInterfaces() {
   // NBIOTSerial.write("AT+NRB\r\n");
   delay(200);
   Serial.println("Reset BLE");
-  Serial.println("AT");
-  BLESerial.write("AT");
-  delay(200);
+  // Serial.println("AT");
+  // BLESerial.write("AT");
+  // delay(200);
   Serial.println("AT+RENEW");
   BLESerial.write("AT+RENEW");
   delay(200);
 
-  resetState = false;
-  setupBLEState = true;
+  // resetState = false;
+  // setupBLEState = true;
+}
+
+void wakeUp() {
+  BLESerial.write("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\r\n");
 }
 
 void onMaster() {
-  if (bleOperationIndex < NUM_MASTEROPERATIONS_BLE) {
-    if (oldStateBle != bleOperationIndex) {  //master operations
-      cmd_ble = masterBLEList[bleOperationIndex];
-      Serial.println(cmd_ble);
-      BLESerial.write(cmd_ble.c_str());
-      oldStateBle = bleOperationIndex;
+  if (isWakeUp) {
+    if (bleOperationIndex < NUM_MASTEROPERATIONS_BLE) {
+      if (oldStateBle != bleOperationIndex) {  //master operations
+        cmd_ble = masterBLEList[bleOperationIndex];
+        Serial.println(cmd_ble);
+        BLESerial.write(cmd_ble.c_str());
+        oldStateBle = bleOperationIndex;
+      }
     }
   }
 }
@@ -54,7 +60,7 @@ void inTransmission() {
     Serial.print("loop: ");
     Serial.println(bleTransmissions);
     bleTransmissions++;
-    delay(5000);
+    delay(DELAY_MESSAGES_BLE);
   }
 
   // if (bleTransmissions > NUM_BLE_MESSAGES - 1) {
@@ -75,6 +81,8 @@ void bleDisconnection() {
       BLESerial.write(cmd_ble.c_str());
       oldStateBle = bleOperationIndex;
     } else {
+      BLESerial.write("AT+SLEEP");
+      isWakeUp = false;
       bleTransmissions = 0;
       bleOperationIndex = 0;
       oldStateBle = -1;
@@ -84,33 +92,33 @@ void bleDisconnection() {
   }
 }
 
-void bleAdvertisement_9() {
-  Serial.println("------------");
-  Serial.print(F("Enter in: "));
-  Serial.println(stateMachine.ActiveStateName());
+// void bleAdvertisement_9() {
+//   Serial.println("------------");
+//   Serial.print(F("Enter in: "));
+//   Serial.println(stateMachine.ActiveStateName());
 
-  bleOperationIndex = 0;
-  oldStateBle = -1;
+//   bleOperationIndex = 0;
+//   oldStateBle = -1;
 
-  BLESerial.write("AT+ADVI9");
-  delay(200);
-  BLESerial.write("AT+RESET");
-  delay(200);
-}
+//   BLESerial.write("AT+ADVI9");
+//   delay(200);
+//   BLESerial.write("AT+RESET");
+//   delay(200);
+// }
 
-void bleAdvertisement_D() {
-  Serial.println("------------");
-  Serial.print(F("Enter in: "));
-  Serial.println(stateMachine.ActiveStateName());
+// void bleAdvertisement_D() {
+//   Serial.println("------------");
+//   Serial.print(F("Enter in: "));
+//   Serial.println(stateMachine.ActiveStateName());
 
-  bleOperationIndex = 0;
-  oldStateBle = -1;
+//   bleOperationIndex = 0;
+//   oldStateBle = -1;
 
-  BLESerial.write("AT+ADVID");
-  delay(200);
-  BLESerial.write("AT+RESET");
-  delay(200);
-}
+//   BLESerial.write("AT+ADVID");
+//   delay(200);
+//   BLESerial.write("AT+RESET");
+//   delay(200);
+// }
 
 
 void setupBlueToothConnection() {

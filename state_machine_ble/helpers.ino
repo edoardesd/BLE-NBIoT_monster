@@ -1,6 +1,6 @@
 void readSerial() {
   if (Serial.available()) {
-    String str = "";
+    str = "";
     Serial.print("Input: ");
 
     prevMillis = millis();
@@ -67,12 +67,20 @@ void checkDisconnBLE() {
 }
 
 void checkResetBLE() {
+  if (strstr(outputBLE.c_str(), "OK+RENEW")) {
+    Serial.println("Hard reset done");
+    resetState = false;
+    setupBLEState = true;
+  }
+
   if (strstr(outputBLE.c_str(), "OK+RESET")) {
     Serial.println("BLE setup done.");
-    BLESerial.write("AT+NAME?");
+    // BLESerial.write("AT+NAME?");
 
     if (strstr(stateMachine.ActiveStateName(), "SETUP_BLE")) {
       bleOperationIndex = 0;
+      BLESerial.write("AT+SLEEP");
+      isWakeUp = false;
       oldStateBle = -1;
       setupBLEState = false;
       bleAdvState = true;
@@ -83,6 +91,19 @@ void checkResetBLE() {
       oldStateBle = -1;
       bleDisconnectionState = false;
       bleAdvState = true;
+    }
+  }
+}
+
+void checkSleep(){
+  // TODO  
+}
+
+void checkWakeUpBLE() {
+  if (!resetState) {
+    if (strstr(outputBLE.c_str(), "OK+WAKE")) {
+      Serial.println("Wake up done");
+      isWakeUp = true;
     }
   }
 }
@@ -127,6 +148,8 @@ void readBLE() {
     Serial.println(outputBLE);
     checkOkBLE();
     checkResetBLE();
+    checkWakeUpBLE();
+    checkSleep();
 
     if (strstr(stateMachine.ActiveStateName(), "BLE_DISCONNECTION")) {
 
