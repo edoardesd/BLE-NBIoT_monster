@@ -61,6 +61,7 @@ void checkDisconnBLE(){
   if(!resetState){
     if(strstr(outputBLE.c_str(), "OK+LOST")){
       Serial.println("BLE DISCONNECTED, go with the next one");
+      digitalWrite(LED_BUILTIN, LOW);
       bleOperationIndex++;
     }
   }
@@ -70,6 +71,8 @@ void checkResetBLE(){
   if(strstr(outputBLE.c_str(), "OK+RESET")) {
     Serial.println("BLE setup done.");
     BLESerial.write("AT+NAME?");
+    digitalWrite(LED_BUILTIN, LOW);
+
 
   if(strstr(stateMachine.ActiveStateName(), "SETUP_BLE")){
     bleOperationIndex = 0;

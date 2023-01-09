@@ -121,6 +121,7 @@ void setupStateMachine() {
 void setup() {
   pinMode(powerPin, OUTPUT);
   digitalWrite(powerPin, HIGH);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   Serial.begin(BAUD_RATE);
   NBIOTSerial.begin(BAUD_RATE);

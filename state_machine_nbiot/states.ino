@@ -1,5 +1,6 @@
 /////////// STATE MACHINE FUNCTIONS /////////////////
 void resetInterfaces() {
+  digitalWrite(LED_BUILTIN, HIGH);
   Serial.println("Resetting the interfaces");
   Serial.println("Reset NB-IoT");
   NBIOTSerial.write("ATI9\r\n");
@@ -35,9 +36,13 @@ if (millis() - messagePreviousMillis >= MSG_DELAY) {
     previousMillis = millis();
 
     Serial.println("Waited enough");
+    digitalWrite(LED_BUILTIN, HIGH);
     transState = false;
     statsState = true;
     msg_counter = 0;
+    }
+  else{
+      digitalWrite(LED_BUILTIN, LOW);
     }
 }
 
@@ -56,7 +61,7 @@ void setupNBIoTConnection() {
 
     if (okNBIOTList == NUM_SETUPOPERATIONS + 2) {
       Serial.println("Socket done! Change state");
-      
+      digitalWrite(LED_BUILTIN, LOW);
       setupNBIOTState = false;
       statsState = true;
     }

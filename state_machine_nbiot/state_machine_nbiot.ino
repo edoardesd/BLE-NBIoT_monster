@@ -2,13 +2,26 @@
 #include <string.h>
 #include <YA_FSM.h>  // https://github.com/cotestatnt/YA_FSM
 
+// #define DEBUG
+
 #define NBIOTSerial Serial1
 #define powerPin 7 
 #define BLENAME "meter0"
 #define NUM_SETUPOPERATIONS 5
-#define BURST_MESSAGE_NBIOT 300000
-#define NUM_MESSAGES_NBIOT 50
 #define MSG_DELAY 300
+
+#if defined(DEBUG)
+/* Operations in debug mode, faster delays */
+#define BURST_MESSAGE_NBIOT 10000
+#define NUM_MESSAGES_NBIOT 3
+
+#else
+/* Operations in normal mode, faster delays */
+#define BURST_MESSAGE_NBIOT 10000
+#define NUM_MESSAGES_NBIOT 10
+#endif
+
+
 
 typedef unsigned char BYTE;
 
@@ -89,6 +102,7 @@ void setupStateMachine() {
 void setup() {
   pinMode(powerPin, OUTPUT);
   digitalWrite(powerPin, HIGH);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   Serial.begin(BAUD_RATE);
   NBIOTSerial.begin(BAUD_RATE);

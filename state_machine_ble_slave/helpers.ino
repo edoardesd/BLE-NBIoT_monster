@@ -54,6 +54,10 @@ void checkOkBLE(){
       Serial.println("Operation ble done, go with the next one");
       bleOperationIndex++;
     }
+    if(strstr(outputBLE.c_str(), "AT+NAME")){
+      Serial.println("Operation name ble done, go with the next one");
+      bleOperationIndex++;
+    }
   }
 }
 

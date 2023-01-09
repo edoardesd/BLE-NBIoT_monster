@@ -78,6 +78,7 @@ void checkResetBLE() {
     // BLESerial.write("AT+NAME?");
 
     if (strstr(stateMachine.ActiveStateName(), "SETUP_BLE")) {
+      digitalWrite(LED_BUILTIN, LOW);
       bleOperationIndex = 0;
       BLESerial.write("AT+SLEEP");
       isWakeUp = false;

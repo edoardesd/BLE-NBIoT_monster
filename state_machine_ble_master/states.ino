@@ -13,6 +13,8 @@ void resetInterfaces() {
   BLESerial.write("AT+RENEW");
   delay(200);
 
+  digitalWrite(LED_BUILTIN, HIGH);
+
   resetState = false;
   setupBLEState = true;
 }
@@ -32,7 +34,8 @@ void bleConnected() {
   for (int i = 0; i < 10; i++) {
     Serial.print("Sending: ");
     Serial.println(message);
-    BLESerial.write(message);
+    digitalWrite(LED_BUILTIN, HIGH);
+    // BLESerial.write(message);
     delay(100);
   }
 
@@ -54,6 +57,7 @@ void bleDisconnection() {
       BLESerial.write(cmd_ble.c_str());
       oldStateBle = bleOperationIndex;
     } else {
+      digitalWrite(LED_BUILTIN, LOW);
       bleTransmissions = 0;
       bleOperationIndex = 0;
       oldStateBle = -1;
@@ -71,7 +75,7 @@ void setupBlueToothConnection() {
       Serial.println(cmd_ble);
       BLESerial.write(cmd_ble.c_str());
       oldStateBle = bleOperationIndex;
-    }
+    }     
   }
 }
 

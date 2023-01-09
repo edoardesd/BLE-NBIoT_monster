@@ -13,6 +13,8 @@ void resetInterfaces() {
   BLESerial.write("AT+RENEW");
   delay(200);
 
+  digitalWrite(LED_BUILTIN, HIGH);
+
   // resetState = false;
   // setupBLEState = true;
 }
@@ -34,18 +36,18 @@ void onMaster() {
   }
 }
 
-void bleConnected() {
-  onEnter();
-  for (int i = 0; i < 10; i++) {
-    Serial.print("Sending: ");
-    Serial.println(message);
-    BLESerial.write(message);
-    delay(100);
-  }
-  bleOperationIndex = 0;
-  oldStateBle = -1;
-  bleTransmissions++;
-}
+// void bleConnected() {
+//   onEnter();
+//   for (int i = 0; i < 10; i++) {
+//     Serial.print("Sending: ");
+//     Serial.println(message);
+//     BLESerial.write(message);
+//     delay(100);
+//   }
+//   bleOperationIndex = 0;
+//   oldStateBle = -1;
+//   bleTransmissions++;
+// }
 
 void inTransmission() {
 
@@ -55,6 +57,7 @@ void inTransmission() {
       Serial.println(message);
       BLESerial.write(message);
       delay(100);
+      digitalWrite(LED_BUILTIN, HIGH);
     }
 
     Serial.print("loop: ");
@@ -81,6 +84,7 @@ void bleDisconnection() {
       BLESerial.write(cmd_ble.c_str());
       oldStateBle = bleOperationIndex;
     } else {
+      digitalWrite(LED_BUILTIN, LOW);
       BLESerial.write("AT+SLEEP");
       isWakeUp = false;
       bleTransmissions = 0;

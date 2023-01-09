@@ -9,7 +9,8 @@
 #define NUM_SETUPOPERATIONS_BLE 11
 #define NUM_MASTEROPERATIONS_BLE 4
 #define NUM_DISCONNOPERATIONS_BLE 6
-#define MAC_TO_CONNECT "A06C65CF6E62"
+// #define MAC_TO_CONNECT "A06C65CF6E62"
+#define MAC_TO_CONNECT "61F760B19F0C"
 #define CONNECTION_TIME 10000
 #define NUM_BLE_MESSAGES 4
 
@@ -109,6 +110,7 @@ void setupStateMachine() {
 void setup() {
   pinMode(powerPin, OUTPUT);
   digitalWrite(powerPin, HIGH);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   Serial.begin(BAUD_RATE);
   NBIOTSerial.begin(BAUD_RATE);
