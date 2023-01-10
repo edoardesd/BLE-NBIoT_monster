@@ -52,6 +52,13 @@ void onWakeUp(){
     NBIOTSerial.write(STATScmd.c_str());
 }
 
+void sendNBIOT(){
+  if(readyToSendNBIOT){
+    NBIOTSerial.write(TRANScmd);
+    readyToSendNBIOT = false;
+  }
+}
+
 void onSleep(){
   sleepState = false;
 }

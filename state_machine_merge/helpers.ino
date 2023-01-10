@@ -100,6 +100,13 @@ void checkOkNBIOT(){
     }
 }
 
+void checkSendNBIOT(){
+  if (strstr(outputNBIOT.c_str(), "0,7")){
+    Serial.println("Datagram sent");
+    sleepState = true;
+  }
+}
+
 void checkRSSI() {
     if (strstr(outputNBIOT.c_str(), "RSRQ")) {
       strcpy(rsrq, strremove(strremove(outputNBIOT.c_str(), "\"RSRQ\",-"), "\r"));
@@ -107,11 +114,8 @@ void checkRSSI() {
       memset(TRANScmd, 0, sizeof TRANScmd);
 
       createMessage();
-
-      Serial.println();
-      Serial.println(TRANScmd);
       Serial.println("Sending ...");
-      sleepState = true;
+      readyToSendNBIOT = true;
   }
 }
 
@@ -127,34 +131,25 @@ void createMessage() {
   }
 
   strcat(payload, stringIdDatagram.c_str());
-  Serial.println(payload);
-
   strcat(payload, "A");
-  Serial.println(payload);
-
   strcat(payload, rsrq);
 
   Serial.println(payload);
 
-  // strcat(payload, remainingPayload);
-  // strcat(payload, remainingPayload);
-
-  Serial.println(payload);
-
-  int len = strlen(payload);
-
-  for (int i = 0, j = 0; i < len; ++i, j += 2) {
+  payloadLen = strlen(payload);
+  for (int i = 0, j = 0; i < payloadLen; ++i, j += 2) {
     sprintf(payloadHex + j, "%02x", payload[i] & 0xff);
   }
 
   Serial.println(payloadHex);
 
   strcat(TRANScmd, "AT+NSOST=0,\"131.175.120.22\",8883,");
-  snprintf(buffer, sizeof(buffer), "%d", len);
+  snprintf(buffer, sizeof(buffer), "%d", payloadLen);
   strcat(TRANScmd, buffer);
   strcat(TRANScmd, ",\"");
   strcat(TRANScmd, payloadHex);
   strcat(TRANScmd, "\"\r\n");
+  Serial.println(TRANScmd);
 }
 
 void readBLE(){
@@ -184,6 +179,7 @@ void readNBIOT() {
 
     if(strstr(stateMachine.ActiveStateName(), "WAKEUP")){
       checkRSSI();
+      checkSendNBIOT();
     }
   }
 }

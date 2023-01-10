@@ -9,7 +9,7 @@
 #define NUM_SETUPOPERATIONS_BLE 11
 #define NUM_MASTEROPERATIONS_BLE 4
 #define NUM_DISCONNOPERATIONS_BLE 6
-#define SLEEP_TIME 5000
+#define SLEEP_TIME 10000
 // #define MAC_TO_CONNECT "A06C65CF6E62"
 #define MAC_TO_CONNECT "61F760B19F0C"
 #define CONNECTION_TIME 10000
@@ -54,6 +54,7 @@ int idDatagram = 0;
 String stringIdDatagram = "";
 char remainingPayload[5] = "AAAA";
 char buffer[5] = "";
+int payloadLen = 0;
 
 
 
@@ -80,6 +81,7 @@ bool resetState = false;
 bool setupBLEState = false;
 bool setupNBIOTState = false;
 bool sleepState = false;
+bool readyToSendNBIOT = false;
 
 enum State { INIT,
              RESET,
@@ -109,7 +111,7 @@ void setupStateMachine() {
   stateMachine.AddState(stateName[SETUP_BLE], onEnter, setupBlueToothConnection, onExit);
   stateMachine.AddState(stateName[SETUP_NBIOT], onEnter, setupNBIoTConnection, onExit);
   stateMachine.AddState(stateName[SLEEP], SLEEP_TIME, onSleep, nullptr, onExit);
-  stateMachine.AddState(stateName[WAKEUP], onWakeUp, nullptr, onExit);
+  stateMachine.AddState(stateName[WAKEUP], onWakeUp, sendNBIOT, onExit);
 
   // bool val at true activate the transition
   stateMachine.AddTransition(RESET, SETUP_BLE, setupBLEState);
