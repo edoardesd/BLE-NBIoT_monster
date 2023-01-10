@@ -124,60 +124,8 @@ void checkRSSI() {
       memset(payload, 0, sizeof payload);
       memset(TRANScmd, 0, sizeof TRANScmd);
 
-
-      // Serial.print("RSRQ: ");
-      // Serial.println(rsrqInt);
-
-
-
-
       createMessage();
-        // Serial.println(buffer);
-        // strcat(payload, stringIdDatagram.c_str());
-        // Serial.println(payload);
 
-        // strcat(payload, "A");
-        // Serial.println(payload);
-
-        // // snprintf(buffer, sizeof(buffer), "%d", rsrqInt);
-        // strcat(payload, rsrq);
-
-
-
-        // Serial.println(payload);
-
-        // strcat(payload, remainingPayload);
-        // strcat(payload, remainingPayload);
-        // // strcat(payload, remainingPayload);
-        // // strcat(payload, "A");
-        // // strcat(payload, remainingPayload);
-        // Serial.println(payload);
-
-
-        // //payload = stringIdDatagram + "A" + rsrqInt + remainingPayload;
-        // //char payloadChar[strlen(payload)+1];
-        // //strcpy(payloadChar, payload);
-        // //Serial.println(payloadChar);
-        // int len = strlen(payload);
-
-        // for (int i = 0, j = 0; i < len; ++i, j += 2){
-        //   sprintf(payloadHex + j, "%02x", payload[i] & 0xff);
-        // }
-
-        // Serial.println(payloadHex);
-
-        // strcat(TRANScmd, "AT+NSOST=0,\"131.175.120.22\",8883,");
-        // snprintf(buffer, sizeof(buffer), "%d", len);
-        // strcat(TRANScmd, buffer);
-        // strcat(TRANScmd, ",\"");
-        // strcat(TRANScmd, payloadHex);
-        // strcat(TRANScmd, "\"\r\n");
-
-
-        // TRANScmd = "AT+NSOST=0,\"131.175.120.22\",8883," + String(len) + ",\"";
-        // TRANScmd = strcat(TRANScmd.c_str(), payloadHex);
-        // TRANScmd = strcat(TRANScmd.c_str(), "\"\r\n");
-        // TRANScmd = TRANScmd_mid + TRANScmd_secondHalf;
         Serial.println();
       Serial.println(TRANScmd);
     }
