@@ -31,7 +31,7 @@ void setupNBIoTConnection() {
       Serial.println("Socket done! Change state");
       digitalWrite(LED_BUILTIN, LOW);
       setupNBIOTState = false;
-      bleAdvState = true;
+      sleepState = true;
     }
   }
   nbIoToldState = okNBIOTList;
@@ -47,3 +47,12 @@ void setupBlueToothConnection() {
     }     
   }
 }
+
+void onWakeUp(){
+    NBIOTSerial.write(STATScmd.c_str());
+}
+
+void onSleep(){
+  sleepState = false;
+}
+

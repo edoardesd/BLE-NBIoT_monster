@@ -9,6 +9,7 @@
 #define NUM_SETUPOPERATIONS_BLE 11
 #define NUM_MASTEROPERATIONS_BLE 4
 #define NUM_DISCONNOPERATIONS_BLE 6
+#define SLEEP_TIME 5000
 // #define MAC_TO_CONNECT "A06C65CF6E62"
 #define MAC_TO_CONNECT "61F760B19F0C"
 #define CONNECTION_TIME 10000
@@ -38,12 +39,24 @@ int bleOperationIndex = 0;
 int nbIoToldState = -1;
 int oldStateBle = -1;
 
-int ADV_TIME = 60000;
+// int SLEEP_TIME = 5000;
 int bleTransmissions = 0;
 
+/***** NB-IOT VARS *****/
 String DGRAMcmd = "AT+NSOCR=\"DGRAM\",17,3365,1\r\n";
 String STATScmd = "AT+NUESTATS\r\n";
 String CGATTcmd = "AT+CGATT?\r\n";
+char TRANScmd[50] = "";
+char rsrq[5] = "";
+char payload[20] = "";
+char payloadHex[20];
+int idDatagram = 0;
+String stringIdDatagram = "";
+char remainingPayload[5] = "AAAA";
+char buffer[5] = "";
+
+
+
 
 
 
@@ -66,13 +79,14 @@ YA_FSM stateMachine;  // Create new FSM
 bool resetState = false;
 bool setupBLEState = false;
 bool setupNBIOTState = false;
-bool bleAdvState = false;
+bool sleepState = false;
 
 enum State { INIT,
              RESET,
              SETUP_BLE,
              SETUP_NBIOT,
-             BLE_ADV,
+             SLEEP,
+             WAKEUP
              //BLE_MASTER,
              //BLE_CONNECTED,
              //BLE_DISCONNECTION
@@ -81,7 +95,8 @@ const char *const stateName[] PROGMEM = { "INIT",
                                           "RESET",
                                           "SETUP_BLE",
                                           "SETUP_NBIOT",
-                                          "BLE_ADV",
+                                          "SLEEP",
+                                          "WAKEUP"
                                           //"BLE_MASTER",
                                           //"BLE_CONNECTED",
                                           //"BLE_DISCONNECTION"
@@ -93,13 +108,17 @@ void setupStateMachine() {
   stateMachine.AddState(stateName[RESET], resetInterfaces, nullptr, onExit);
   stateMachine.AddState(stateName[SETUP_BLE], onEnter, setupBlueToothConnection, onExit);
   stateMachine.AddState(stateName[SETUP_NBIOT], onEnter, setupNBIoTConnection, onExit);
-  stateMachine.AddState(stateName[BLE_ADV], ADV_TIME, onEnter, nullptr, onExit);
+  stateMachine.AddState(stateName[SLEEP], SLEEP_TIME, onSleep, nullptr, onExit);
+  stateMachine.AddState(stateName[WAKEUP], onWakeUp, nullptr, onExit);
 
   // bool val at true activate the transition
   stateMachine.AddTransition(RESET, SETUP_BLE, setupBLEState);
   stateMachine.AddTransition(SETUP_BLE, SETUP_NBIOT, setupNBIOTState);
-  stateMachine.AddTransition(SETUP_NBIOT, BLE_ADV, bleAdvState);
+  stateMachine.AddTransition(SETUP_NBIOT, SLEEP, sleepState);
+  stateMachine.AddTransition(WAKEUP, SLEEP, sleepState);
   stateMachine.AddTransition(INIT, RESET, resetState);
+
+  stateMachine.AddTimedTransition(SLEEP, WAKEUP);
 }
 
 void setup() {

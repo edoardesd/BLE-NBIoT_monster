@@ -100,6 +100,62 @@ void checkOkNBIOT(){
     }
 }
 
+void checkRSSI() {
+    if (strstr(outputNBIOT.c_str(), "RSRQ")) {
+      strcpy(rsrq, strremove(strremove(outputNBIOT.c_str(), "\"RSRQ\",-"), "\r"));
+      memset(payload, 0, sizeof payload);
+      memset(TRANScmd, 0, sizeof TRANScmd);
+
+      createMessage();
+
+      Serial.println();
+      Serial.println(TRANScmd);
+      Serial.println("Sending ...");
+      sleepState = true;
+  }
+}
+
+void createMessage() {
+  if (idDatagram < 10) {
+    stringIdDatagram = "00" + String(idDatagram);
+  }
+  if (idDatagram >= 10 && idDatagram < 100) {
+    stringIdDatagram = "0" + String(idDatagram);
+  }
+  if (idDatagram >= 100 && idDatagram < 1000) {
+    stringIdDatagram = String(idDatagram);
+  }
+
+  strcat(payload, stringIdDatagram.c_str());
+  Serial.println(payload);
+
+  strcat(payload, "A");
+  Serial.println(payload);
+
+  strcat(payload, rsrq);
+
+  Serial.println(payload);
+
+  // strcat(payload, remainingPayload);
+  // strcat(payload, remainingPayload);
+
+  Serial.println(payload);
+
+  int len = strlen(payload);
+
+  for (int i = 0, j = 0; i < len; ++i, j += 2) {
+    sprintf(payloadHex + j, "%02x", payload[i] & 0xff);
+  }
+
+  Serial.println(payloadHex);
+
+  strcat(TRANScmd, "AT+NSOST=0,\"131.175.120.22\",8883,");
+  snprintf(buffer, sizeof(buffer), "%d", len);
+  strcat(TRANScmd, buffer);
+  strcat(TRANScmd, ",\"");
+  strcat(TRANScmd, payloadHex);
+  strcat(TRANScmd, "\"\r\n");
+}
 
 void readBLE(){
   if (BLESerial.available()) {
@@ -124,6 +180,10 @@ void readNBIOT() {
     if(strstr(stateMachine.ActiveStateName(), "SETUP_NBIOT")){
       checkOkNBIOT();
       checkConnectionNBIOT();
+    }
+
+    if(strstr(stateMachine.ActiveStateName(), "WAKEUP")){
+      checkRSSI();
     }
   }
 }

@@ -119,14 +119,13 @@ void checkRSSI() {
   if (!resetState) {
     if (strstr(outputNBIOT.c_str(), "RSRQ")) {
       strcpy(rsrq, strremove(strremove(outputNBIOT.c_str(), "\"RSRQ\",-"), "\r"));
-      // int rsrqInt = rsrq.toInt();
 
       memset(payload, 0, sizeof payload);
       memset(TRANScmd, 0, sizeof TRANScmd);
 
       createMessage();
 
-        Serial.println();
+      Serial.println();
       Serial.println(TRANScmd);
     }
   }
