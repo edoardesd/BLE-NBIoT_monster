@@ -1,19 +1,22 @@
 #include <SoftwareSerial.h>
 #include <string.h>
 #include <YA_FSM.h>  // https://github.com/cotestatnt/YA_FSM
+#include <MemoryFree.h>
+
 
 #define NBIOTSerial Serial1
 #define powerPin 7
 #define BLENAME "meter0"
 #define NUM_SETUPOPERATIONS_NBIOT 5
-#define NUM_SETUPOPERATIONS_BLE 11
-#define NUM_MASTEROPERATIONS_BLE 4
+#define NUM_SETUPOPERATIONS_BLE 4
+#define NUM_MASTEROPERATIONS_BLE 3
 #define NUM_DISCONNOPERATIONS_BLE 6
 #define SLEEP_TIME 10000
 // #define MAC_TO_CONNECT "A06C65CF6E62"
 #define MAC_TO_CONNECT "61F760B19F0C"
 #define CONNECTION_TIME 10000
 #define NUM_BLE_MESSAGES 4
+#define RSRQ_THRESHOLD 19
 
 
 const char *BLE_TAG = "BLE+";
@@ -43,9 +46,9 @@ int oldStateBle = -1;
 int bleTransmissions = 0;
 
 /***** NB-IOT VARS *****/
-String DGRAMcmd = "AT+NSOCR=\"DGRAM\",17,3365,1\r\n";
-String STATScmd = "AT+NUESTATS\r\n";
-String CGATTcmd = "AT+CGATT?\r\n";
+char DGRAMcmd[35] = "AT+NSOCR=\"DGRAM\",17,3365,1\r\n";
+char STATScmd[15] = "AT+NUESTATS\r\n";
+char CGATTcmd[13] = "AT+CGATT?\r\n";
 char TRANScmd[50] = "";
 char rsrq[5] = "";
 char payload[20] = "";
@@ -55,6 +58,7 @@ String stringIdDatagram = "";
 char remainingPayload[5] = "AAAA";
 char buffer[5] = "";
 int payloadLen = 0;
+int rsrqInt = 0;
 
 
 
@@ -62,11 +66,11 @@ int payloadLen = 0;
 
 
 String setupIoTList[NUM_SETUPOPERATIONS_NBIOT] = { "AT+CMEE=1", "AT+CFUN=1", "AT+CGDCONT=1,\"IP\",\"nb.inetd.gdsp\"", "AT+CEREG=2", "AT+COPS=1,2,\"22210\"" };
-String setupBLEList[NUM_SETUPOPERATIONS_BLE] = { "AT+IMME0", "AT+ROLE0", "AT+NAMEmeter1", "AT+NOTI1", "AT+NOTP1", "AT+ADTY0", "AT+BAUD0", "AT+ADVI7", "AT+SHOW3", "AT+PWRM1", "AT+RESET" };
-String masterBLEList[NUM_MASTEROPERATIONS_BLE] = { "AT+RESET", "AT+IMME1", "AT+ROLE1", "AT+DISC?" };
+String setupBLEList[NUM_SETUPOPERATIONS_BLE] = { "AT+IMME0", "AT+ROLE0", "AT+NAMEmeter1", "AT+RESET"};
+String masterBLEList[NUM_MASTEROPERATIONS_BLE] = {"AT+IMME1", "AT+ROLE1", "AT+DISC?" };
 String disconnectionBLEList[NUM_DISCONNOPERATIONS_BLE] = { "AT", "AT+IMME0", "AT+ROLE0", "AT+NAMEmeter1", "AT+RESET" };
 
-String cmd;
+String cmdNBIOT;
 String cmd_ble;
 
 char *strremove(char *str, const char *sub);
@@ -81,6 +85,7 @@ bool resetState = false;
 bool setupBLEState = false;
 bool setupNBIOTState = false;
 bool sleepState = false;
+bool masterState = false;
 bool readyToSendNBIOT = false;
 
 enum State { INIT,
@@ -88,18 +93,18 @@ enum State { INIT,
              SETUP_BLE,
              SETUP_NBIOT,
              SLEEP,
-             WAKEUP
-             //BLE_MASTER,
+             WAKEUP,
+             BLE_MASTER,
              //BLE_CONNECTED,
              //BLE_DISCONNECTION
              };                                                                                                         // State Alias
-const char *const stateName[] PROGMEM = { "INIT",
-                                          "RESET",
-                                          "SETUP_BLE",
-                                          "SETUP_NBIOT",
-                                          "SLEEP",
-                                          "WAKEUP"
-                                          //"BLE_MASTER",
+const char *const stateName[] PROGMEM = { "INT",
+                                          "RST",
+                                          "S_BLE",
+                                          "S_NB",
+                                          "SLP",
+                                          "WAKE",
+                                          "BLE_M",
                                           //"BLE_CONNECTED",
                                           //"BLE_DISCONNECTION"
                                           };  // Helper for print labels instead integer when state change
@@ -112,12 +117,15 @@ void setupStateMachine() {
   stateMachine.AddState(stateName[SETUP_NBIOT], onEnter, setupNBIoTConnection, onExit);
   stateMachine.AddState(stateName[SLEEP], SLEEP_TIME, onSleep, nullptr, onExit);
   stateMachine.AddState(stateName[WAKEUP], onWakeUp, sendNBIOT, onExit);
+  stateMachine.AddState(stateName[BLE_MASTER], onEnter, onMaster, onExit);
+
 
   // bool val at true activate the transition
   stateMachine.AddTransition(RESET, SETUP_BLE, setupBLEState);
   stateMachine.AddTransition(SETUP_BLE, SETUP_NBIOT, setupNBIOTState);
   stateMachine.AddTransition(SETUP_NBIOT, SLEEP, sleepState);
   stateMachine.AddTransition(WAKEUP, SLEEP, sleepState);
+  stateMachine.AddTransition(WAKEUP, BLE_MASTER, masterState);
   stateMachine.AddTransition(INIT, RESET, resetState);
 
   stateMachine.AddTimedTransition(SLEEP, WAKEUP);

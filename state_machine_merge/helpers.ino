@@ -66,7 +66,7 @@ void checkResetBLE(){
     digitalWrite(LED_BUILTIN, LOW);
 
 
-  if(strstr(stateMachine.ActiveStateName(), "SETUP_BLE")){
+  if(strstr(stateMachine.ActiveStateName(), "S_BLE")){
     bleOperationIndex = 0;
     oldStateBle = -1;
     setupBLEState = false;
@@ -87,7 +87,7 @@ void checkConnectionNBIOT() {
     if (strstr(outputNBIOT.c_str(), CEREG_NBIOT_TAG)) {
       Serial.println("Connected!");
       delay(200);
-      NBIOTSerial.write(CGATTcmd.c_str());
+      NBIOTSerial.write(CGATTcmd);
       // TODO: check if CGATT returns 1
     }
 
@@ -110,12 +110,22 @@ void checkSendNBIOT(){
 void checkRSSI() {
     if (strstr(outputNBIOT.c_str(), "RSRQ")) {
       strcpy(rsrq, strremove(strremove(outputNBIOT.c_str(), "\"RSRQ\",-"), "\r"));
-      memset(payload, 0, sizeof payload);
-      memset(TRANScmd, 0, sizeof TRANScmd);
+      // convert rsrq in int 
+      rsrqInt = atoi(rsrq);
+      Serial.println(rsrqInt);
+      if (rsrqInt < RSRQ_THRESHOLD && rsrqInt > 0){      
+        // if > 190 master
+        memset(payload, 0, sizeof payload);
+        memset(TRANScmd, 0, sizeof TRANScmd);
 
-      createMessage();
-      Serial.println("Sending ...");
-      readyToSendNBIOT = true;
+        createMessage();
+        Serial.println("Sending ...");
+        readyToSendNBIOT = true;
+      } else {
+        Serial.println("ERROR: RSRQ too low for the transmission");  
+        Serial.println("Setting up master mode");   
+        masterState = true; 
+      }
   }
 }
 
@@ -168,16 +178,16 @@ void readNBIOT() {
     outputNBIOT = NBIOTSerial.readStringUntil('\n');
     Serial.println(outputNBIOT);
     
-    if(strstr(stateMachine.ActiveStateName(), "RESET")){
+    if(strstr(stateMachine.ActiveStateName(), "RST")){
       checkResetNBIOT();
     }
 
-    if(strstr(stateMachine.ActiveStateName(), "SETUP_NBIOT")){
+    if(strstr(stateMachine.ActiveStateName(), "S_NB")){
       checkOkNBIOT();
       checkConnectionNBIOT();
     }
 
-    if(strstr(stateMachine.ActiveStateName(), "WAKEUP")){
+    if(strstr(stateMachine.ActiveStateName(), "WAKE")){
       checkRSSI();
       checkSendNBIOT();
     }

@@ -18,13 +18,13 @@ void setupNBIoTConnection() {
   // if operation is increased
   if (nbIoToldState != okNBIOTList) {
     if (okNBIOTList < NUM_SETUPOPERATIONS_NBIOT) {
-      cmd = strcat(setupIoTList[okNBIOTList].c_str(), "\r\n");
-      Serial.println(cmd);
-      NBIOTSerial.write(cmd.c_str());
+      cmdNBIOT = strcat(setupIoTList[okNBIOTList].c_str(), "\r\n");
+      Serial.println(cmdNBIOT);
+      NBIOTSerial.write(cmdNBIOT.c_str());
     }
     if (okNBIOTList == NUM_SETUPOPERATIONS_NBIOT + 1) {
       Serial.println(DGRAMcmd);
-      NBIOTSerial.write(DGRAMcmd.c_str());
+      NBIOTSerial.write(DGRAMcmd);
     }
 
     if (okNBIOTList == NUM_SETUPOPERATIONS_NBIOT + 2) {
@@ -49,7 +49,7 @@ void setupBlueToothConnection() {
 }
 
 void onWakeUp(){
-    NBIOTSerial.write(STATScmd.c_str());
+    NBIOTSerial.write(STATScmd);
 }
 
 void sendNBIOT(){
@@ -61,5 +61,16 @@ void sendNBIOT(){
 
 void onSleep(){
   sleepState = false;
+}
+
+void onMaster() {
+  if (bleOperationIndex < NUM_MASTEROPERATIONS_BLE) {
+    if (oldStateBle != bleOperationIndex) {  //master operations
+      cmd_ble = masterBLEList[bleOperationIndex];
+      Serial.println(cmd_ble);
+      BLESerial.write(cmd_ble.c_str());
+      oldStateBle = bleOperationIndex;
+    }
+  }
 }
 
