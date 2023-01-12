@@ -11,11 +11,9 @@
 #define NUM_SETUPOPERATIONS_BLE 4
 #define NUM_MASTEROPERATIONS_BLE 3
 #define NUM_DISCONNOPERATIONS_BLE 6
-#define SLEEP_TIME 10000
-// #define MAC_TO_CONNECT "A06C65CF6E62"
-#define MAC_TO_CONNECT "61F760B19F0C"
+#define SLEEP_TIME 5000
+#define MAC_TO_CONNECT "94A9A83B7B35"
 #define CONNECTION_TIME 10000
-#define NUM_BLE_MESSAGES 4
 #define RSRQ_THRESHOLD 19
 
 
@@ -36,14 +34,14 @@ SoftwareSerial BLESerial(BLUETOOTH_RX, BLUETOOTH_TX);
 
 String outputNBIOT;
 String outputBLE;
-char message[] = "00000000000000000000";
-int okNBIOTList = 0;
-int bleOperationIndex = 0;
-int nbIoToldState = -1;
-int oldStateBle = -1;
+char messageBLE[] = "00000000000000000000";
+uint8_t okNBIOTList = 0;
+uint8_t bleOperationIndex = 0;
+uint8_t nbIoToldState = -1;
+uint8_t oldStateBle = -1;
 
 // int SLEEP_TIME = 5000;
-int bleTransmissions = 0;
+uint8_t bleTransmissions = 0;
 
 /***** NB-IOT VARS *****/
 char DGRAMcmd[35] = "AT+NSOCR=\"DGRAM\",17,3365,1\r\n";
@@ -53,17 +51,15 @@ char TRANScmd[50] = "";
 char rsrq[5] = "";
 char payload[20] = "";
 char payloadHex[20];
-int idDatagram = 0;
+uint8_t idDatagram = 0;
 String stringIdDatagram = "";
-char remainingPayload[5] = "AAAA";
+char remainingPayload[4] = "AAAA";
 char buffer[5] = "";
-int payloadLen = 0;
+uint8_t payloadLen = 0;
 int rsrqInt = 0;
 
-
-
-
-
+char mac[13];
+bool macFound = false;
 
 String setupIoTList[NUM_SETUPOPERATIONS_NBIOT] = { "AT+CMEE=1", "AT+CFUN=1", "AT+CGDCONT=1,\"IP\",\"nb.inetd.gdsp\"", "AT+CEREG=2", "AT+COPS=1,2,\"22210\"" };
 String setupBLEList[NUM_SETUPOPERATIONS_BLE] = { "AT+IMME0", "AT+ROLE0", "AT+NAMEmeter1", "AT+RESET"};
@@ -87,6 +83,7 @@ bool setupNBIOTState = false;
 bool sleepState = false;
 bool masterState = false;
 bool readyToSendNBIOT = false;
+bool connectedState = false;
 
 enum State { INIT,
              RESET,
@@ -95,7 +92,7 @@ enum State { INIT,
              SLEEP,
              WAKEUP,
              BLE_MASTER,
-             //BLE_CONNECTED,
+             BLE_CONNECTED,
              //BLE_DISCONNECTION
              };                                                                                                         // State Alias
 const char *const stateName[] PROGMEM = { "INT",
@@ -105,7 +102,7 @@ const char *const stateName[] PROGMEM = { "INT",
                                           "SLP",
                                           "WAKE",
                                           "BLE_M",
-                                          //"BLE_CONNECTED",
+                                          "BLE_C",
                                           //"BLE_DISCONNECTION"
                                           };  // Helper for print labels instead integer when state change
 
@@ -118,6 +115,7 @@ void setupStateMachine() {
   stateMachine.AddState(stateName[SLEEP], SLEEP_TIME, onSleep, nullptr, onExit);
   stateMachine.AddState(stateName[WAKEUP], onWakeUp, sendNBIOT, onExit);
   stateMachine.AddState(stateName[BLE_MASTER], onEnter, onMaster, onExit);
+  stateMachine.AddState(stateName[BLE_CONNECTED], bleConnected, nullptr, onExit);
 
 
   // bool val at true activate the transition
@@ -126,6 +124,7 @@ void setupStateMachine() {
   stateMachine.AddTransition(SETUP_NBIOT, SLEEP, sleepState);
   stateMachine.AddTransition(WAKEUP, SLEEP, sleepState);
   stateMachine.AddTransition(WAKEUP, BLE_MASTER, masterState);
+  stateMachine.AddTransition(BLE_MASTER, BLE_CONNECTED, connectedState);
   stateMachine.AddTransition(INIT, RESET, resetState);
 
   stateMachine.AddTimedTransition(SLEEP, WAKEUP);
@@ -141,9 +140,7 @@ void setup() {
   BLESerial.begin(BAUD_RATE);
   delay(2000);
 
-  Serial.println("==== BLE Module started ====");
-  Serial.println();
-  Serial.println("Starting the Finite State Machine...");
+  Serial.println(F("Start FSM"));
   setupStateMachine();
   //switch from INIT to SETUP
   resetState = true;
@@ -156,7 +153,7 @@ void loop() {
 
 
   if (stateMachine.Update()) {
-    Serial.print(F("Active state: "));
+    Serial.print(F("State: "));
     Serial.println(stateMachine.ActiveStateName());
   }
 }

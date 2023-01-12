@@ -1,16 +1,14 @@
 /////////// STATE MACHINE FUNCTIONS /////////////////
 void resetInterfaces() {
   digitalWrite(LED_BUILTIN, HIGH); 
-  Serial.println("Resetting the interfaces");
-  Serial.println("Reset NB-IoT");
+  Serial.println(F("Rst intrfc"));
+  Serial.println(F("RST NB"));
   NBIOTSerial.write("ATI9\r\n");
   NBIOTSerial.write("AT+NRB\r\n");
   delay(200);
-  Serial.println("Reset BLE");
-  Serial.println("AT");
+  Serial.println(F("Rst BLE"));
   BLESerial.write("AT");
   delay(200);
-  Serial.println("AT+RENEW");
   BLESerial.write("AT+RENEW");
 }
 
@@ -28,7 +26,7 @@ void setupNBIoTConnection() {
     }
 
     if (okNBIOTList == NUM_SETUPOPERATIONS_NBIOT + 2) {
-      Serial.println("Socket done! Change state");
+      Serial.println(F("Sckt done"));
       digitalWrite(LED_BUILTIN, LOW);
       setupNBIOTState = false;
       sleepState = true;
@@ -71,6 +69,16 @@ void onMaster() {
       BLESerial.write(cmd_ble.c_str());
       oldStateBle = bleOperationIndex;
     }
+  }
+}
+
+void bleConnected() {
+  for (uint8_t i = 0; i < 10; i++) {
+    Serial.print(F("Sending: "));
+    Serial.println(messageBLE);
+    BLESerial.write(messageBLE);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(100);
   }
 }
 

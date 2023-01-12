@@ -6,7 +6,7 @@
 #define powerPin 7 
 #define BLENAME "meter0"
 #define NUM_SETUPOPERATIONS_NBIoT 5
-#define NUM_SETUPOPERATIONS_BLE 11
+#define NUM_SETUPOPERATIONS_BLE 3
 #define NUM_MASTEROPERATIONS_BLE 2
 
 const char *BLE_TAG = "BLE+";
@@ -27,7 +27,7 @@ String outputBLE;
 int okNBIOTList = 0;
 int bleOperationIndex = 0;
 int oldStateBle = -1;
-String setupBLEList[NUM_SETUPOPERATIONS_BLE] = {"AT+IMME0", "AT+ROLE0", "AT+NAMEmeSE-104", "AT+NOTI1", "AT+NOTP1", "AT+ADTY3", "AT+BAUD0", "AT+ADVI1", "AT+SHOW3", "AT+PWRM1", "AT+RESET"};
+String setupBLEList[NUM_SETUPOPERATIONS_BLE] = {"AT+IMME0", "AT+ROLE0", "AT+RESET"};
 String masterBLEList[NUM_MASTEROPERATIONS_BLE] = {"AT+IMME1", "AT+ROLE1"};
 String cmd_ble;
 

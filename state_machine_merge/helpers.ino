@@ -1,7 +1,7 @@
 void readSerial(){
   if (Serial.available()) {
     String str = "";
-    Serial.print("Input: ");
+    Serial.print(F("Input: "));
     
     prevMillis = millis();
     while (millis() - prevMillis < READ_TIME) {
@@ -14,13 +14,13 @@ void readSerial(){
     }
 
     if (strstr(str.c_str(), BLE_TAG)){
-      Serial.print("BLE Stream: ");
+      Serial.print(F("BLE Stream: "));
       str = strremove(str.c_str(), BLE_TAG);
       BLESerial.print(str);
     }
 
     if (strstr(str.c_str(), NBIOT_TAG)){
-      Serial.print("NB-IoT Stream: ");
+      Serial.print(F("NB-IoT Stream: "));
       str = strremove(str.c_str(), NBIOT_TAG);
       str = strcat(str.c_str(), "\r\n");
       NBIOTSerial.write(str.c_str());
@@ -43,25 +43,25 @@ char *strremove(char *str, const char *sub) {
 void checkOkBLE(){
   if(!resetState){
     if(strstr(outputBLE.c_str(), "OK+Set")){
-      Serial.println("Operation ble done, go with the next one");
+      Serial.println(F("Next BLE ops"));
       bleOperationIndex++;
     }
   }
 }
 
-void checkDisconnBLE(){
-  if(!resetState){
-    if(strstr(outputBLE.c_str(), "OK+LOST")){
-      Serial.println("BLE DISCONNECTED, go with the next one");
-      digitalWrite(LED_BUILTIN, LOW);
-      bleOperationIndex++;
-    }
-  }
-}
+// void checkDisconnBLE(){
+//   if(!resetState){
+//     if(strstr(outputBLE.c_str(), "OK+LOST")){
+//       Serial.println(F("BLE DISCONNECTED, go with the next one"));
+//       digitalWrite(LED_BUILTIN, LOW);
+//       bleOperationIndex++;
+//     }
+//   }
+// }
 
 void checkResetBLE(){
   if(strstr(outputBLE.c_str(), "OK+RESET")) {
-    Serial.println("BLE setup done.");
+    Serial.println(F("BLE setup done"));
     BLESerial.write("AT+NAME?");
     digitalWrite(LED_BUILTIN, LOW);
 
@@ -77,7 +77,7 @@ void checkResetBLE(){
 
 void checkResetNBIOT() {
   if (strstr(outputNBIOT.c_str(), RESET_NBIOT_TAG)) {
-    Serial.println("NBIoT Reset done.");
+    Serial.println(F("NBIoT Reset done"));
     resetState = false;
     setupBLEState = true;
   }
@@ -85,7 +85,7 @@ void checkResetNBIOT() {
 
 void checkConnectionNBIOT() {
     if (strstr(outputNBIOT.c_str(), CEREG_NBIOT_TAG)) {
-      Serial.println("Connected!");
+      Serial.println(F("Conn!"));
       delay(200);
       NBIOTSerial.write(CGATTcmd);
       // TODO: check if CGATT returns 1
@@ -102,7 +102,7 @@ void checkOkNBIOT(){
 
 void checkSendNBIOT(){
   if (strstr(outputNBIOT.c_str(), "0,7")){
-    Serial.println("Datagram sent");
+    Serial.println(F("Sent"));
     sleepState = true;
   }
 }
@@ -119,11 +119,11 @@ void checkRSSI() {
         memset(TRANScmd, 0, sizeof TRANScmd);
 
         createMessage();
-        Serial.println("Sending ...");
+        Serial.println(F("Sending"));
         readyToSendNBIOT = true;
       } else {
-        Serial.println("ERROR: RSRQ too low for the transmission");  
-        Serial.println("Setting up master mode");   
+        Serial.println(F("ERROR: RSRQ low"));  
+        Serial.println(F("Set up master"));   
         masterState = true; 
       }
   }
@@ -147,7 +147,7 @@ void createMessage() {
   Serial.println(payload);
 
   payloadLen = strlen(payload);
-  for (int i = 0, j = 0; i < payloadLen; ++i, j += 2) {
+  for (uint8_t i = 0, j = 0; i < payloadLen; ++i, j += 2) {
     sprintf(payloadHex + j, "%02x", payload[i] & 0xff);
   }
 
@@ -162,14 +162,49 @@ void createMessage() {
   Serial.println(TRANScmd);
 }
 
+
+void checkDiscovery(){
+  if(strstr(outputBLE.c_str(), "OK+DISC")){
+    char *mac_start = strchr(outputBLE.c_str(), ':');
+    uint8_t index = (uint8_t)(mac_start - outputBLE.c_str()+1);
+    strncpy(mac, &outputBLE.c_str()[index], 12);
+    mac[12]='\0';
+
+    if(strstr(mac, MAC_TO_CONNECT)){
+      Serial.println(F("MAC found"));
+      macFound = true;
+    }
+  }
+
+  if(strstr(outputBLE.c_str(), "OK+DISCE") && macFound){
+    BLESerial.write(strcat("AT+CON", MAC_TO_CONNECT)); //CHECKKKKKK!!!! it's not a return
+  }
+}
+
+void checkConnection(){
+  Serial.println("check conn");  
+  if(strstr(outputBLE.c_str(), "OK+CONNA")){
+    Serial.println(F("Connected"));
+    bleOperationIndex = 0;
+    oldStateBle = -1;
+    masterState = false;
+    // connectedState = true;
+  }
+}
+
 void readBLE(){
   if (BLESerial.available()) {
-    Serial.print("HM10: ");
+    Serial.print(F("HM10: "));
     
     outputBLE = BLESerial.readStringUntil('\n');
     Serial.println(outputBLE);
     checkOkBLE();
     checkResetBLE();
+
+    if(strstr(stateMachine.ActiveStateName(), "BLE_M")){
+      checkDiscovery();
+      checkConnection();
+    }
   }  
 }
 
