@@ -60,8 +60,19 @@ void sendNBIOT(){
   }
 }
 
+void forwardNBIOT(){
+  Serial.println("Ready to forward");
+  Serial.println(forwardPayload);
+  strcpy(payloadHex, forwardPayload);
+  Serial.println(payloadHex);
+  forwardPayload[0] = '\0';
+  delay(1000);
+  sleepState = true;
+}
+
 void onSleep(){
   sleepState = false;
+  forwardState = false;
 }
 
 void onMaster() {

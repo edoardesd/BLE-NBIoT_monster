@@ -26,9 +26,14 @@ void checkOkNBIOT(){
 }
 
 void checkSendNBIOT(){
-  if (strstr(outputNBIOT.c_str(), "0,7")){
+  if (strstr(outputNBIOT.c_str(), "0,10")){
     Serial.println(F("Sent"));
-    sleepState = true;
+
+    if(strlen(forwardPayload) > 1){
+      forwardState = true;
+    } else {
+      sleepState = true;
+    }
   }
 }
 

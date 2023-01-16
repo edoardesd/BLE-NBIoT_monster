@@ -3,7 +3,7 @@
 #include <YA_FSM.h>  // https://github.com/cotestatnt/YA_FSM
 #include <MemoryFree.h>
 
-#define MAIN
+// #define MAIN
 
 #define NBIOTSerial Serial1
 #define powerPin 7
@@ -21,7 +21,7 @@
 #else 
   #define BLENAME "m1"
   #define RSRQ_THRESHOLD 250
-  #define SLEEP_TIME 60000
+  #define SLEEP_TIME 20000
 #endif  
 
 
@@ -64,6 +64,7 @@ char TRANScmd[50] = "";
 char rsrq[5] = "";
 char payload[20] = "";
 char payloadHex[25];
+char forwardPayload[25];
 uint8_t idDatagram = 0;
 String stringIdDatagram = "";
 char remainingPayload[4] = "AAAA";
@@ -97,6 +98,7 @@ bool sleepState = false;
 bool masterState = false;
 bool readyToSendNBIOT = false;
 bool connectedState = false;
+bool forwardState = false;
 
 enum State { INIT,
              RESET,
@@ -106,7 +108,8 @@ enum State { INIT,
              WAKEUP,
              BLE_MASTER,
              BLE_CONNECTED,
-             BLE_DISCONNECT
+             BLE_DISCONNECT,
+             NBIOT_FORWARD
              };                                                                                                         // State Alias
 const char *const stateName[] PROGMEM = { "INT",
                                           "RST",
@@ -116,7 +119,8 @@ const char *const stateName[] PROGMEM = { "INT",
                                           "WAKE",
                                           "BLE_M",
                                           "BLE_C",
-                                          "BLE_DISC"
+                                          "BLE_DISC",
+                                          "NB_FWD"
                                           };  // Helper for print labels instead integer when state change
 
 
@@ -130,6 +134,7 @@ void setupStateMachine() {
   stateMachine.AddState(stateName[BLE_MASTER], onEnter, onMaster, onExit);
   stateMachine.AddState(stateName[BLE_CONNECTED], CONNECTION_TIME, bleConnected, nullptr, onExit);
   stateMachine.AddState(stateName[BLE_DISCONNECT], bleDisc, nullptr, onExit);
+  stateMachine.AddState(stateName[NBIOT_FORWARD], forwardNBIOT, nullptr, onExit);
 
 
   // bool val at true activate the transition
@@ -138,6 +143,8 @@ void setupStateMachine() {
   stateMachine.AddTransition(SETUP_BLE, SETUP_NBIOT, setupNBIOTState);
   stateMachine.AddTransition(SETUP_NBIOT, SLEEP, sleepState);
   stateMachine.AddTransition(WAKEUP, SLEEP, sleepState);
+  stateMachine.AddTransition(WAKEUP, NBIOT_FORWARD, forwardState);
+  stateMachine.AddTransition(NBIOT_FORWARD, SLEEP, sleepState);
   stateMachine.AddTransition(WAKEUP, BLE_MASTER, masterState);
   stateMachine.AddTransition(BLE_MASTER, BLE_CONNECTED, connectedState);
   stateMachine.AddTransition(BLE_DISCONNECT, SLEEP, sleepState);
