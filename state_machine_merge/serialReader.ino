@@ -6,13 +6,19 @@ void readBLE(){
     
     outputBLE = BLESerial.readStringUntil('\n');
     Serial.println(outputBLE);
-    checkOkBLE();
-    checkResetBLE();
+    if(strstr(stateMachine.ActiveStateName(), "S_BLE") || 
+      strstr(stateMachine.ActiveStateName(), "BLE_M")){
+      checkOkBLE(); // check only if in right state...
+      checkResetBLE();
+    }
 
     if(strstr(stateMachine.ActiveStateName(), "BLE_M")){
       checkDiscovery();
       checkConnection();
     }
+
+    // check message and react
+    checkMessageBLE();
   }  
 }
 

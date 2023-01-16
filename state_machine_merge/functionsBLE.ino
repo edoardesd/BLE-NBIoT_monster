@@ -33,6 +33,12 @@ void checkResetBLE(){
   }
 }
 
+void checkMessageBLE(){
+  if(strstr(outputBLE.c_str(), "6d")){
+    Serial.println("Received help request from another node");
+  }
+}
+
 void checkDiscovery(){
   if(strstr(outputBLE.c_str(), "OK+DISC")){
     char *mac_start = strchr(outputBLE.c_str(), ':');
