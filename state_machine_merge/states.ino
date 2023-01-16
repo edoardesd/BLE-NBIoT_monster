@@ -73,12 +73,16 @@ void onMaster() {
 }
 
 void bleConnected() {
-  for (uint8_t i = 0; i < 10; i++) {
-    Serial.print(F("Sending: "));
-    Serial.println(messageBLE);
-    BLESerial.write(messageBLE);
+  Serial.print(F("Sending: "));
+  Serial.println(payloadHex);
+  BLESerial.write(payloadHex);
+  for (i = 0; i < 5; i++){
     digitalWrite(LED_BUILTIN, HIGH);
     delay(100);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(100);
   }
+  bleOperationIndex = 0;
+  oldStateBle = -1;
 }
 

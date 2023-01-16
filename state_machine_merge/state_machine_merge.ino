@@ -43,10 +43,15 @@ uint8_t oldStateBle = -1;
 // int SLEEP_TIME = 5000;
 uint8_t bleTransmissions = 0;
 
+/***** Helpers *****/
+uint8_t i = 0;
+uint8_t j = 0;
+
 /***** NB-IOT VARS *****/
 char DGRAMcmd[35] = "AT+NSOCR=\"DGRAM\",17,3365,1\r\n";
 char STATScmd[15] = "AT+NUESTATS\r\n";
 char CGATTcmd[13] = "AT+CGATT?\r\n";
+char connectCMD[13] = ""; 
 char TRANScmd[50] = "";
 char rsrq[5] = "";
 char payload[20] = "";

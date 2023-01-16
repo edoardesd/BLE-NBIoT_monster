@@ -108,28 +108,28 @@ void checkSendNBIOT(){
 }
 
 void checkRSSI() {
-    if (strstr(outputNBIOT.c_str(), "RSRQ")) {
-      strcpy(rsrq, strremove(strremove(outputNBIOT.c_str(), "\"RSRQ\",-"), "\r"));
-      // convert rsrq in int 
-      rsrqInt = atoi(rsrq);
-      Serial.println(rsrqInt);
-      if (rsrqInt < RSRQ_THRESHOLD && rsrqInt > 0){      
-        // if > 190 master
-        memset(payload, 0, sizeof payload);
-        memset(TRANScmd, 0, sizeof TRANScmd);
+  if (strstr(outputNBIOT.c_str(), "RSRQ")) {
+    strcpy(rsrq, strremove(strremove(outputNBIOT.c_str(), "\"RSRQ\",-"), "\r"));
+    rsrqInt = atoi(rsrq);  // convert rsrq in int 
+    Serial.println(rsrqInt);
+    
+    memset(payload, 0, sizeof payload);
+    memset(TRANScmd, 0, sizeof TRANScmd);
 
-        createMessage();
-        Serial.println(F("Sending"));
-        readyToSendNBIOT = true;
-      } else {
-        Serial.println(F("ERROR: RSRQ low"));  
-        Serial.println(F("Set up master"));   
-        masterState = true; 
-      }
+    createMessage();
+
+    if (rsrqInt < RSRQ_THRESHOLD && rsrqInt > 0){      
+      Serial.println(F("Sending"));
+      readyToSendNBIOT = true;
+    } else {
+      Serial.println(F("ERROR: RSRQ low"));  
+      Serial.println(F("Set up master"));   
+      masterState = true; 
+    }
   }
 }
 
-void createMessage() {
+void createPayload(){
   if (idDatagram < 10) {
     stringIdDatagram = "00" + String(idDatagram);
   }
@@ -145,13 +145,20 @@ void createMessage() {
   strcat(payload, rsrq);
 
   Serial.println(payload);
+}
 
+void createHexPayload(){
   payloadLen = strlen(payload);
-  for (uint8_t i = 0, j = 0; i < payloadLen; ++i, j += 2) {
+  for (i = 0, j = 0; i < payloadLen; ++i, j += 2) {
     sprintf(payloadHex + j, "%02x", payload[i] & 0xff);
   }
 
-  Serial.println(payloadHex);
+  Serial.println(payloadHex); // Divide payload
+}
+
+void createMessage() {
+  createPayload();
+  createHexPayload();
 
   strcat(TRANScmd, "AT+NSOST=0,\"131.175.120.22\",8883,");
   snprintf(buffer, sizeof(buffer), "%d", payloadLen);
@@ -177,18 +184,20 @@ void checkDiscovery(){
   }
 
   if(strstr(outputBLE.c_str(), "OK+DISCE") && macFound){
-    BLESerial.write(strcat("AT+CON", MAC_TO_CONNECT)); //CHECKKKKKK!!!! it's not a return
+    strcat(connectCMD, "AT+CON");
+    strcat(connectCMD, MAC_TO_CONNECT);
+    Serial.println(connectCMD);
+    BLESerial.write(connectCMD);
   }
 }
 
 void checkConnection(){
-  Serial.println("check conn");  
   if(strstr(outputBLE.c_str(), "OK+CONNA")){
-    Serial.println(F("Connected"));
+    Serial.println(F("Connected!"));
     bleOperationIndex = 0;
     oldStateBle = -1;
     masterState = false;
-    // connectedState = true;
+    connectedState = true;
   }
 }
 
