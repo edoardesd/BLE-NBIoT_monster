@@ -54,17 +54,13 @@ void checkRSSI() {
   }
 }
 
-void createPayload(){
-  if (idDatagram < 10) {
-    stringIdDatagram = "00" + String(idDatagram);
-  }
-  if (idDatagram >= 10 && idDatagram < 100) {
-    stringIdDatagram = "0" + String(idDatagram);
-  }
-  if (idDatagram >= 100 && idDatagram < 1000) {
-    stringIdDatagram = String(idDatagram);
-  }
 
+void createPayload(){
+  payload[0] = '\0';
+  createIdDatagram();
+
+  strcat(payload, BLENAME);
+  strcat(payload, "A");
   strcat(payload, stringIdDatagram.c_str());
   strcat(payload, "A");
   strcat(payload, rsrq);
@@ -73,6 +69,7 @@ void createPayload(){
 }
 
 void createHexPayload(){
+  payloadHex[0] = '\0';
   payloadLen = strlen(payload);
   for (i = 0, j = 0; i < payloadLen; ++i, j += 2) {
     sprintf(payloadHex + j, "%02x", payload[i] & 0xff);
@@ -82,6 +79,8 @@ void createHexPayload(){
 }
 
 void createMessage() {
+  TRANScmd[0] = '\0';
+  buffer[0] = '\0';
   createPayload();
   createHexPayload();
 

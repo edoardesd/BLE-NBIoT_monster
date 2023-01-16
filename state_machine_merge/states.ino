@@ -85,7 +85,15 @@ void bleConnected() {
     digitalWrite(LED_BUILTIN, LOW);
     delay(100);
   }
+  
+}
+
+void bleDisc(){
   bleOperationIndex = 0;
   oldStateBle = -1;
+  connectedState = false;
+  Serial.println("Disconnecting");
+  BLESerial.write("AT");
+  sleepState = true;
 }
 

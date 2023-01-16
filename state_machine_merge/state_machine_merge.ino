@@ -3,18 +3,27 @@
 #include <YA_FSM.h>  // https://github.com/cotestatnt/YA_FSM
 #include <MemoryFree.h>
 
+#define MAIN
 
 #define NBIOTSerial Serial1
 #define powerPin 7
-#define BLENAME "m0"
 #define NUM_SETUPOPERATIONS_NBIOT 5
 #define NUM_SETUPOPERATIONS_BLE 4
 #define NUM_MASTEROPERATIONS_BLE 3
 #define NUM_DISCONNOPERATIONS_BLE 6
-#define SLEEP_TIME 5000
 #define MAC_TO_CONNECT "94A9A83B7B35"
 #define CONNECTION_TIME 10000
-#define RSRQ_THRESHOLD 19
+
+#if defined(MAIN)
+  #define BLENAME "m0"
+  #define RSRQ_THRESHOLD 19
+  #define SLEEP_TIME 5000
+#else 
+  #define BLENAME "m1"
+  #define RSRQ_THRESHOLD 250
+  #define SLEEP_TIME 60000
+#endif  
+
 
 
 const char *BLE_TAG = "BLE+";
@@ -34,7 +43,6 @@ SoftwareSerial BLESerial(BLUETOOTH_RX, BLUETOOTH_TX);
 
 String outputNBIOT;
 String outputBLE;
-char messageBLE[] = "00000000000000000000";
 uint8_t okNBIOTList = 0;
 uint8_t bleOperationIndex = 0;
 uint8_t nbIoToldState = -1;
@@ -55,7 +63,7 @@ char connectCMD[13] = "";
 char TRANScmd[50] = "";
 char rsrq[5] = "";
 char payload[20] = "";
-char payloadHex[20];
+char payloadHex[25];
 uint8_t idDatagram = 0;
 String stringIdDatagram = "";
 char remainingPayload[4] = "AAAA";
@@ -98,7 +106,7 @@ enum State { INIT,
              WAKEUP,
              BLE_MASTER,
              BLE_CONNECTED,
-             //BLE_DISCONNECTION
+             BLE_DISCONNECT
              };                                                                                                         // State Alias
 const char *const stateName[] PROGMEM = { "INT",
                                           "RST",
@@ -108,7 +116,7 @@ const char *const stateName[] PROGMEM = { "INT",
                                           "WAKE",
                                           "BLE_M",
                                           "BLE_C",
-                                          //"BLE_DISCONNECTION"
+                                          "BLE_DISC"
                                           };  // Helper for print labels instead integer when state change
 
 
@@ -120,19 +128,23 @@ void setupStateMachine() {
   stateMachine.AddState(stateName[SLEEP], SLEEP_TIME, onSleep, nullptr, onExit);
   stateMachine.AddState(stateName[WAKEUP], onWakeUp, sendNBIOT, onExit);
   stateMachine.AddState(stateName[BLE_MASTER], onEnter, onMaster, onExit);
-  stateMachine.AddState(stateName[BLE_CONNECTED], bleConnected, nullptr, onExit);
+  stateMachine.AddState(stateName[BLE_CONNECTED], CONNECTION_TIME, bleConnected, nullptr, onExit);
+  stateMachine.AddState(stateName[BLE_DISCONNECT], bleDisc, nullptr, onExit);
 
 
   // bool val at true activate the transition
+  stateMachine.AddTransition(INIT, RESET, resetState);
   stateMachine.AddTransition(RESET, SETUP_BLE, setupBLEState);
   stateMachine.AddTransition(SETUP_BLE, SETUP_NBIOT, setupNBIOTState);
   stateMachine.AddTransition(SETUP_NBIOT, SLEEP, sleepState);
   stateMachine.AddTransition(WAKEUP, SLEEP, sleepState);
   stateMachine.AddTransition(WAKEUP, BLE_MASTER, masterState);
   stateMachine.AddTransition(BLE_MASTER, BLE_CONNECTED, connectedState);
-  stateMachine.AddTransition(INIT, RESET, resetState);
+  stateMachine.AddTransition(BLE_DISCONNECT, SLEEP, sleepState);
+
 
   stateMachine.AddTimedTransition(SLEEP, WAKEUP);
+  stateMachine.AddTimedTransition(BLE_CONNECTED, BLE_DISCONNECT);
 }
 
 void setup() {

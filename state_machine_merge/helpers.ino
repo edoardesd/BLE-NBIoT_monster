@@ -39,3 +39,15 @@ char *strremove(char *str, const char *sub) {
     }
     return str;
 }
+
+void createIdDatagram(){
+  if (idDatagram < 10) {
+    stringIdDatagram = "00" + String(idDatagram);
+  }
+  if (idDatagram >= 10 && idDatagram < 100) {
+    stringIdDatagram = "0" + String(idDatagram);
+  }
+  if (idDatagram >= 100 && idDatagram < 1000) {
+    stringIdDatagram = String(idDatagram);
+  }
+}
