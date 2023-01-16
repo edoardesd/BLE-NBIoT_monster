@@ -6,7 +6,7 @@
 
 #define NBIOTSerial Serial1
 #define powerPin 7
-#define BLENAME "meter0"
+#define BLENAME "m0"
 #define NUM_SETUPOPERATIONS_NBIOT 5
 #define NUM_SETUPOPERATIONS_BLE 4
 #define NUM_MASTEROPERATIONS_BLE 3
@@ -67,7 +67,7 @@ char mac[13];
 bool macFound = false;
 
 String setupIoTList[NUM_SETUPOPERATIONS_NBIOT] = { "AT+CMEE=1", "AT+CFUN=1", "AT+CGDCONT=1,\"IP\",\"nb.inetd.gdsp\"", "AT+CEREG=2", "AT+COPS=1,2,\"22210\"" };
-String setupBLEList[NUM_SETUPOPERATIONS_BLE] = { "AT+IMME0", "AT+ROLE0", "AT+NAMEmeter1", "AT+RESET"};
+String setupBLEList[NUM_SETUPOPERATIONS_BLE] = { "AT+IMME0", "AT+ROLE0", "AT+NAME", "AT+RESET"};
 String masterBLEList[NUM_MASTEROPERATIONS_BLE] = {"AT+IMME1", "AT+ROLE1", "AT+DISC?" };
 String disconnectionBLEList[NUM_DISCONNOPERATIONS_BLE] = { "AT", "AT+IMME0", "AT+ROLE0", "AT+NAMEmeter1", "AT+RESET" };
 

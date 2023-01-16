@@ -39,6 +39,9 @@ void setupBlueToothConnection() {
   if (oldStateBle != bleOperationIndex) {
     if (bleOperationIndex < NUM_SETUPOPERATIONS_BLE) {  //Ordinary operations
       cmd_ble = setupBLEList[bleOperationIndex];
+      if(strstr(cmd_ble.c_str(), "NAME")){
+        strcat(cmd_ble.c_str(), BLENAME);
+      }
       Serial.println(cmd_ble);
       BLESerial.write(cmd_ble.c_str());
       oldStateBle = bleOperationIndex;
