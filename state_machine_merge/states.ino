@@ -57,6 +57,8 @@ void sendNBIOT(){
   if(readyToSendNBIOT){
     NBIOTSerial.write(TRANScmd);
     readyToSendNBIOT = false;
+    // forwardPayload[0] = '\0';
+
   }
 }
 
@@ -64,10 +66,15 @@ void forwardNBIOT(){
   Serial.println("Ready to forward");
   Serial.println(forwardPayload);
   strcpy(payloadHex, forwardPayload);
-  Serial.println(payloadHex);
   forwardPayload[0] = '\0';
-  delay(1000);
-  sleepState = true;
+  Serial.println(payloadHex);
+  Serial.println(F("Forwarding"));
+  readyToSendNBIOT = true;
+  
+  
+  // forwardPayload[0] = '\0';
+  // delay(1000);
+  // sleepState = true;
 }
 
 void onSleep(){

@@ -134,7 +134,7 @@ void setupStateMachine() {
   stateMachine.AddState(stateName[BLE_MASTER], onEnter, onMaster, onExit);
   stateMachine.AddState(stateName[BLE_CONNECTED], CONNECTION_TIME, bleConnected, nullptr, onExit);
   stateMachine.AddState(stateName[BLE_DISCONNECT], bleDisc, nullptr, onExit);
-  stateMachine.AddState(stateName[NBIOT_FORWARD], forwardNBIOT, nullptr, onExit);
+  stateMachine.AddState(stateName[NBIOT_FORWARD], forwardNBIOT, sendNBIOT, onExit);
 
 
   // bool val at true activate the transition

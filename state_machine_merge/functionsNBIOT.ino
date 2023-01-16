@@ -32,6 +32,7 @@ void checkSendNBIOT(){
     if(strlen(forwardPayload) > 1){
       forwardState = true;
     } else {
+      Serial.print(F("No requests"));
       sleepState = true;
     }
   }
@@ -46,7 +47,11 @@ void checkRSSI() {
     memset(payload, 0, sizeof payload);
     memset(TRANScmd, 0, sizeof TRANScmd);
 
-    createMessage();
+    TRANScmd[0] = '\0';
+    buffer[0] = '\0';
+    createPayload();
+    createHexPayload();
+    createMessage(payloadHex);
 
     if (rsrqInt < RSRQ_THRESHOLD && rsrqInt > 0){      
       Serial.println(F("Sending"));
@@ -83,17 +88,12 @@ void createHexPayload(){
   Serial.println(payloadHex); // Divide payload
 }
 
-void createMessage() {
-  TRANScmd[0] = '\0';
-  buffer[0] = '\0';
-  createPayload();
-  createHexPayload();
-
+void createMessage(char *currentHex) {
   strcat(TRANScmd, "AT+NSOST=0,\"131.175.120.22\",8883,");
-  snprintf(buffer, sizeof(buffer), "%d", payloadLen);
+  snprintf(buffer, sizeof(buffer), "%d", strlen(currentHex)/2); 
   strcat(TRANScmd, buffer);
   strcat(TRANScmd, ",\"");
-  strcat(TRANScmd, payloadHex);
+  strcat(TRANScmd, currentHex);
   strcat(TRANScmd, "\"\r\n");
   Serial.println(TRANScmd);
 }

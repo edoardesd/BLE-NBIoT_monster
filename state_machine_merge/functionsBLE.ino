@@ -35,8 +35,9 @@ void checkResetBLE(){
 
 void checkMessageBLE(){
   if(strstr(outputBLE.c_str(), "6d")){
-    Serial.println("Received help request from another node");
+    Serial.println(F("Received help request from another node"));
     strcpy(forwardPayload, outputBLE.c_str());
+    Serial.println(forwardPayload);
   }
 }
 
