@@ -32,7 +32,6 @@ void checkSendNBIOT(){
     if(strlen(forwardPayload) > 1){
       forwardState = true;
     } else {
-      Serial.print(F("No requests"));
       sleepState = true;
     }
   }
@@ -44,11 +43,9 @@ void checkRSSI() {
     rsrqInt = atoi(rsrq);  // convert rsrq in int 
     Serial.println(rsrqInt);
     
-    memset(payload, 0, sizeof payload);
-    memset(TRANScmd, 0, sizeof TRANScmd);
+    // memset(payload, 0, sizeof payload);
+    // memset(TRANScmd, 0, sizeof TRANScmd);
 
-    TRANScmd[0] = '\0';
-    buffer[0] = '\0';
     createPayload();
     createHexPayload();
     createMessage(payloadHex);
@@ -89,6 +86,8 @@ void createHexPayload(){
 }
 
 void createMessage(char *currentHex) {
+  TRANScmd[0] = '\0';
+  buffer[0] = '\0';
   strcat(TRANScmd, "AT+NSOST=0,\"131.175.120.22\",8883,");
   snprintf(buffer, sizeof(buffer), "%d", strlen(currentHex)/2); 
   strcat(TRANScmd, buffer);

@@ -17,8 +17,10 @@ void readBLE(){
       checkConnection();
     }
 
-    // check message and react
-    checkMessageBLE();
+    if(!resetState || !setupBLEState || !setupNBIOTState){
+      // check message and react
+      checkMessageBLE();
+    }
   }  
 }
 

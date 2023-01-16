@@ -41,6 +41,7 @@ char *strremove(char *str, const char *sub) {
 }
 
 void createIdDatagram(){
+  Serial.println(idDatagram);
   if (idDatagram < 10) {
     stringIdDatagram = "00" + String(idDatagram);
   }
@@ -50,4 +51,5 @@ void createIdDatagram(){
   if (idDatagram >= 100 && idDatagram < 1000) {
     stringIdDatagram = String(idDatagram);
   }
+  idDatagram++;
 }
