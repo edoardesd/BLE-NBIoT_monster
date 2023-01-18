@@ -55,5 +55,9 @@ void createIdDatagram(){
   if (idDatagram >= 100 && idDatagram < 1000) {
     stringIdDatagram = String(idDatagram);
   }
+  if (idDatagram >= 1000){
+    stringIdDatagram = 999;
+    idDatagram = 0;
+  }
   idDatagram++;
 }

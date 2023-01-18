@@ -97,6 +97,8 @@ void bleConnected() {
     digitalWrite(LED_BUILTIN, LOW);
     delay(100);
   }
+  // memset(payloadHex, 0, sizeof payloadHex);
+
   
 }
 

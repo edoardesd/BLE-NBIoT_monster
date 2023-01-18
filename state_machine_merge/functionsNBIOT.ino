@@ -89,8 +89,6 @@ void createHexPayload(){
   for (i = 0, j = 0; i < payloadLen; ++i, j += 2) {
     sprintf(payloadHex + j, "%02x", payload[i] & 0xff);
   }
-
-  // Serial.println(payloadHex); // Divide payload
 }
 
 void createMessage() {
@@ -103,5 +101,5 @@ void createMessage() {
   strcat(TRANScmd, payloadHex);
   strcat(TRANScmd, "\"\r\n");
   Serial.println(TRANScmd);
-  memset(payloadHex, 0, sizeof payloadHex);
+  // memset(payloadHex, 0, sizeof payloadHex);
 }

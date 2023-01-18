@@ -18,7 +18,7 @@
 
 #if defined(MAIN)
   #define BLENAME "m0"
-  #define SLEEP_TIME 10000
+  #define SLEEP_TIME 20000
 #else 
   #define BLENAME "m1"
   #define SLEEP_TIME 20000
@@ -29,7 +29,7 @@ bool forceBLE = false;
 
 const char *BLE_TAG = "BLE+";
 const char *NBIOT_TAG = "NB+";
-const char *FORCE_TAG = "NOBLE";
+const char *FORCE_TAG = "NONB";
 const char *CEREG_NBIOT_TAG = "CEREG: 5";
 const char *SUCCESS_NBIOT_TAG = "OK";
 const char *RESET_NBIOT_TAG = "UFOTAS";
