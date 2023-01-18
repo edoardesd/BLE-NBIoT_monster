@@ -67,7 +67,7 @@ void forwardNBIOT(){
   strcpy(payloadHex, forwardPayload);
   forwardPayload[0] = '\0';
   Serial.println(payloadHex);
-  createMessage(payloadHex);
+  createMessage();
   Serial.println(F("Forwarding"));
   readyToSendNBIOT = true;
 }

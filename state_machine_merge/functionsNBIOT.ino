@@ -48,7 +48,7 @@ void checkRSSI() {
 
     createPayload();
     createHexPayload();
-    createMessage(payloadHex);
+    createMessage();
 
     if (rsrqInt < RSRQ_THRESHOLD && rsrqInt > 0){      
       Serial.println(F("Sending"));
@@ -85,14 +85,20 @@ void createHexPayload(){
   Serial.println(payloadHex); // Divide payload
 }
 
-void createMessage(char *currentHex) {
+void createMessage() {
   TRANScmd[0] = '\0';
   buffer[0] = '\0';
   strcat(TRANScmd, "AT+NSOST=0,\"131.175.120.22\",8883,");
-  snprintf(buffer, sizeof(buffer), "%d", strlen(currentHex)/2); 
+  Serial.println(TRANScmd);
+  snprintf(buffer, sizeof(buffer), "%d", strlen(payloadHex)/2); 
   strcat(TRANScmd, buffer);
+  Serial.println(TRANScmd);
+
   strcat(TRANScmd, ",\"");
-  strcat(TRANScmd, currentHex);
+  strcat(TRANScmd, payloadHex);
   strcat(TRANScmd, "\"\r\n");
   Serial.println(TRANScmd);
+
+  Serial.println(TRANScmd);
+  payloadHex[0] = '\0';
 }
