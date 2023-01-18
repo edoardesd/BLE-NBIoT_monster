@@ -41,6 +41,7 @@ void setupBlueToothConnection() {
       cmd_ble = setupBLEList[bleOperationIndex];
       if(strstr(cmd_ble.c_str(), "NAME")){
         strcat(cmd_ble.c_str(), BLENAME);
+        strcat(cmd_ble.c_str(), "-121");
       }
       Serial.println(cmd_ble);
       BLESerial.write(cmd_ble.c_str());
@@ -103,6 +104,7 @@ void bleDisc(){
   bleOperationIndex = 0;
   oldStateBle = -1;
   connectedState = false;
+  disconnectedState = false;
   Serial.println("Disconnecting");
   BLESerial.write("AT");
   sleepState = true;

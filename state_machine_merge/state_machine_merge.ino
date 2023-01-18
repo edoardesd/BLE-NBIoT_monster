@@ -3,7 +3,7 @@
 #include <YA_FSM.h>  // https://github.com/cotestatnt/YA_FSM
 #include <MemoryFree.h>
 
-// #define MAIN
+#define MAIN
 
 #define NBIOTSerial Serial1
 #define powerPin 7
@@ -13,21 +13,23 @@
 #define NUM_DISCONNOPERATIONS_BLE 6
 #define MAC_TO_CONNECT "94A9A83B7B35"
 #define CONNECTION_TIME 10000
+#define RSRQ_THRESHOLD 250
+
 
 #if defined(MAIN)
   #define BLENAME "m0"
-  #define RSRQ_THRESHOLD 19
-  #define SLEEP_TIME 5000
+  #define SLEEP_TIME 10000
 #else 
   #define BLENAME "m1"
-  #define RSRQ_THRESHOLD 250
   #define SLEEP_TIME 20000
 #endif  
 
+bool forceBLE = false;
 
 
 const char *BLE_TAG = "BLE+";
 const char *NBIOT_TAG = "NB+";
+const char *FORCE_TAG = "NOBLE";
 const char *CEREG_NBIOT_TAG = "CEREG: 5";
 const char *SUCCESS_NBIOT_TAG = "OK";
 const char *RESET_NBIOT_TAG = "UFOTAS";
@@ -99,6 +101,7 @@ bool masterState = false;
 bool readyToSendNBIOT = false;
 bool connectedState = false;
 bool forwardState = false;
+bool disconnectedState = false;
 
 enum State { INIT,
              RESET,

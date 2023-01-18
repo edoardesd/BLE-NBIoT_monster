@@ -53,13 +53,19 @@ void checkDiscovery(){
     }
   }
 
-  if(strstr(outputBLE.c_str(), "OK+DISCE") && macFound){
+  if(strstr(outputBLE.c_str(), "OK+DISCE")){
+    if(macFound){
     memset(connectCMD, 0, sizeof connectCMD);
     strcat(connectCMD, "AT+CON");
     strcat(connectCMD, MAC_TO_CONNECT);
     Serial.println(connectCMD);
     BLESerial.write(connectCMD);
+  }else{
+    Serial.println(F("WARNING: Mac not found"));
+    masterState = false;
+    disconnectedState = true;
   }
+}
 }
 
 void checkConnection(){

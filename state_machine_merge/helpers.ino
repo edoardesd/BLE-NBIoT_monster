@@ -13,6 +13,11 @@ void readSerial(){
       }
     }
 
+    if (strstr(str.c_str(), FORCE_TAG)){
+      Serial.println(F("WARNING: NB-IoT not available"));
+      forceBLE = true;
+    }
+
     if (strstr(str.c_str(), BLE_TAG)){
       Serial.print(F("BLE Stream: "));
       str = strremove(str.c_str(), BLE_TAG);
@@ -41,7 +46,6 @@ char *strremove(char *str, const char *sub) {
 }
 
 void createIdDatagram(){
-  Serial.println(idDatagram);
   if (idDatagram < 10) {
     stringIdDatagram = "00" + String(idDatagram);
   }

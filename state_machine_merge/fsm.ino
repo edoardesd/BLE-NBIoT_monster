@@ -1,4 +1,3 @@
-
 void setupStateMachine() {
   stateMachine.AddState(stateName[INIT], nullptr, nullptr, onExit);
   stateMachine.AddState(stateName[RESET], resetInterfaces, nullptr, onExit);
@@ -23,6 +22,8 @@ void setupStateMachine() {
   stateMachine.AddTransition(WAKEUP, BLE_MASTER, masterState);
   stateMachine.AddTransition(BLE_MASTER, BLE_CONNECTED, connectedState);
   stateMachine.AddTransition(BLE_DISCONNECT, SLEEP, sleepState);
+  stateMachine.AddTransition(BLE_MASTER, BLE_DISCONNECT, disconnectedState);
+
 
 
   stateMachine.AddTimedTransition(SLEEP, WAKEUP);

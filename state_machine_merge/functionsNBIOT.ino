@@ -37,29 +37,37 @@ void checkSendNBIOT(){
   }
 }
 
+void prepareConnBLE(){
+  Serial.println(F("ERROR: RSRQ low... Set up master"));  
+  forceBLE = false; 
+  masterState = true; 
+}
+
+
 void checkRSSI() {
   if (strstr(outputNBIOT.c_str(), "RSRQ")) {
     strcpy(rsrq, strremove(strremove(outputNBIOT.c_str(), "\"RSRQ\",-"), "\r"));
     rsrqInt = atoi(rsrq);  // convert rsrq in int 
     Serial.println(rsrqInt);
-    
-    // memset(payload, 0, sizeof payload);
-    // memset(TRANScmd, 0, sizeof TRANScmd);
 
     createPayload();
     createHexPayload();
     createMessage();
 
-    if (rsrqInt < RSRQ_THRESHOLD && rsrqInt > 0){      
-      Serial.println(F("Sending"));
-      readyToSendNBIOT = true;
-    } else {
-      Serial.println(F("ERROR: RSRQ low"));  
-      Serial.println(F("Set up master"));   
-      masterState = true; 
+    if(forceBLE){
+      prepareConnBLE();
+    } 
+    if(!forceBLE){
+      if (rsrqInt < RSRQ_THRESHOLD && rsrqInt > 0){  
+        Serial.println(F("Sending"));
+        readyToSendNBIOT = true;
+      } else {
+        prepareConnBLE();
+      }
     }
-  }
 }
+}
+
 
 
 void createPayload(){
@@ -72,7 +80,7 @@ void createPayload(){
   strcat(payload, "A");
   strcat(payload, rsrq);
 
-  Serial.println(payload);
+  // Serial.println(payload);
 }
 
 void createHexPayload(){
@@ -82,7 +90,7 @@ void createHexPayload(){
     sprintf(payloadHex + j, "%02x", payload[i] & 0xff);
   }
 
-  Serial.println(payloadHex); // Divide payload
+  // Serial.println(payloadHex); // Divide payload
 }
 
 void createMessage() {
