@@ -63,7 +63,7 @@ void checkRSSI() {
 
 
 void createPayload(){
-  payload[0] = '\0';
+  memset(payload, 0, sizeof payload);
   createIdDatagram();
 
   strcat(payload, BLENAME);
@@ -76,7 +76,7 @@ void createPayload(){
 }
 
 void createHexPayload(){
-  payloadHex[0] = '\0';
+  memset(payloadHex, 0, sizeof payloadHex);
   payloadLen = strlen(payload);
   for (i = 0, j = 0; i < payloadLen; ++i, j += 2) {
     sprintf(payloadHex + j, "%02x", payload[i] & 0xff);
@@ -86,19 +86,14 @@ void createHexPayload(){
 }
 
 void createMessage() {
-  TRANScmd[0] = '\0';
-  buffer[0] = '\0';
+  memset(TRANScmd, 0, sizeof TRANScmd);
+  memset(buffer, 0, sizeof buffer);
   strcat(TRANScmd, "AT+NSOST=0,\"131.175.120.22\",8883,");
-  Serial.println(TRANScmd);
   snprintf(buffer, sizeof(buffer), "%d", strlen(payloadHex)/2); 
   strcat(TRANScmd, buffer);
-  Serial.println(TRANScmd);
-
   strcat(TRANScmd, ",\"");
   strcat(TRANScmd, payloadHex);
   strcat(TRANScmd, "\"\r\n");
   Serial.println(TRANScmd);
-
-  Serial.println(TRANScmd);
-  payloadHex[0] = '\0';
+  memset(payloadHex, 0, sizeof payloadHex);
 }

@@ -54,7 +54,7 @@ void checkDiscovery(){
   }
 
   if(strstr(outputBLE.c_str(), "OK+DISCE") && macFound){
-    connectCMD[0] = '\0';
+    memset(connectCMD, 0, sizeof connectCMD);
     strcat(connectCMD, "AT+CON");
     strcat(connectCMD, MAC_TO_CONNECT);
     Serial.println(connectCMD);
