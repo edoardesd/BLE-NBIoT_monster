@@ -30,6 +30,14 @@ void checkResetBLE(){
     setupBLEState = false;
     setupNBIOTState = true;
     }
+
+  //connected
+    //  if(strstr(stateMachine.ActiveStateName(), "BLE_C")){
+    // bleOperationIndex = 0;
+    // oldStateBle = -1;
+    // isconnectedState = false;
+    // sleepState = true;
+    // }
   }
 }
 

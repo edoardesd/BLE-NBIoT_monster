@@ -102,13 +102,24 @@ void bleConnected() {
   
 }
 
+// void bleDiscLoop(){
+//   if (bleOperationIndex < NUM_DISCONNOPERATIONS_BLE) {
+  //   if (oldStateBle != bleOperationIndex) { 
+  //     cmd_ble = disconnectionBLEList[bleOperationIndex];
+  //     Serial.println(cmd_ble);
+  //     BLESerial.write(cmd_ble.c_str());
+  //     oldStateBle = bleOperationIndex;
+  //   }
+  // }
+// }
+
 void bleDisc(){
   bleOperationIndex = 0;
   oldStateBle = -1;
   connectedState = false;
-  disconnectedState = false;
+  // disconnectedState = false;
   Serial.println("Disconnecting");
-  BLESerial.write("AT");
-  sleepState = true;
+  BLESerial.write("AT"); //go to disconnect loop, no sleep direct
+  // sleepState = true;
 }
 

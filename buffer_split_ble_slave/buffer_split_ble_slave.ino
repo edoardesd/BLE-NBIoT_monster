@@ -52,9 +52,10 @@ void setup() {
   Serial.begin(BAUD_RATE);
   BLESerial.begin(BAUD_RATE);
 
+  delay(1000);
   Serial.println("==== BLE Module started ====");
   Serial.println();
-  setupBlueToothConnection();
+  // setupBlueToothConnection();
   Serial.println("Setup Complete");
 }
 

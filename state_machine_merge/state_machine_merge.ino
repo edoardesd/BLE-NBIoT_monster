@@ -2,16 +2,20 @@
 #include <string.h>
 #include <YA_FSM.h>  // https://github.com/cotestatnt/YA_FSM
 #include <MemoryFree.h>
+#include <ArduinoUniqueID.h>
 
-#define MAIN
+// 58 37 33 31 30 32 01 0C 16 
+// 58 37 33 31 30 32 13 17 19 
+// A06C65CF7F9COK
+// #define MAIN
 
 #define NBIOTSerial Serial1
 #define powerPin 7
 #define NUM_SETUPOPERATIONS_NBIOT 5
-#define NUM_SETUPOPERATIONS_BLE 4
+#define NUM_SETUPOPERATIONS_BLE 9
 #define NUM_MASTEROPERATIONS_BLE 3
-#define NUM_DISCONNOPERATIONS_BLE 6
-#define MAC_TO_CONNECT "94A9A83B7B35"
+#define NUM_DISCONNOPERATIONS_BLE 4
+
 #define CONNECTION_TIME 10000
 #define RSRQ_THRESHOLD 250
 
@@ -19,11 +23,15 @@
 #if defined(MAIN)
   #define BLENAME "m0"
   #define SLEEP_TIME 20000
+  #define MAC_TO_CONNECT "A06C65CF7F9C" // N
+
 #else 
   #define BLENAME "m1"
   #define SLEEP_TIME 20000
+  #define MAC_TO_CONNECT "94A9A83B7B35" // B
 #endif  
-
+  // char BLENAME[2];
+  // int SLEEP_TIME;
 bool forceBLE = false;
 
 
@@ -58,7 +66,7 @@ uint8_t i = 0;
 uint8_t j = 0;
 
 /***** NB-IOT VARS *****/
-char DGRAMcmd[35] = "AT+NSOCR=\"DGRAM\",17,3365,1\r\n";
+char DGRAMcmd[35] = "AT+NSOCR=\"DGRAM\",17,3365,1\r\n"; //TODO const
 char STATScmd[15] = "AT+NUESTATS\r\n";
 char CGATTcmd[13] = "AT+CGATT?\r\n";
 char connectCMD[13] = ""; 
@@ -78,9 +86,9 @@ char mac[13];
 bool macFound = false;
 
 String setupIoTList[NUM_SETUPOPERATIONS_NBIOT] = { "AT+CMEE=1", "AT+CFUN=1", "AT+CGDCONT=1,\"IP\",\"nb.inetd.gdsp\"", "AT+CEREG=2", "AT+COPS=1,2,\"22210\"" };
-String setupBLEList[NUM_SETUPOPERATIONS_BLE] = { "AT+IMME0", "AT+ROLE0", "AT+NAME", "AT+RESET"};
+String setupBLEList[NUM_SETUPOPERATIONS_BLE] = { "AT+IMME0", "AT+ROLE0", "AT+NAME", "AT+NOTI1", "AT+NOTP1", "AT+ADTY0", "AT+ADVI1", "AT+SHOW3", "AT+RESET"};
 String masterBLEList[NUM_MASTEROPERATIONS_BLE] = {"AT+IMME1", "AT+ROLE1", "AT+DISC?" };
-String disconnectionBLEList[NUM_DISCONNOPERATIONS_BLE] = { "AT", "AT+IMME0", "AT+ROLE0", "AT+NAMEmeter1", "AT+RESET" };
+String disconnectionBLEList[NUM_DISCONNOPERATIONS_BLE] = { "AT", "AT+IMME0", "AT+ROLE0", "AT+RESET" };
 
 String cmdNBIOT;
 String cmd_ble;
@@ -90,7 +98,7 @@ void readSerial();
 void readBLE();
 void readNBIOT();
 
-/***** FINITE STATE MACHINE VARS *****/
+/***** FINITE STATE MACHINE VARS *****/ //TODO class?
 YA_FSM stateMachine;  // Create new FSM
 
 bool resetState = false;
@@ -137,6 +145,27 @@ void setup() {
   BLESerial.begin(BAUD_RATE);
   delay(2000);
 
+	// UniqueIDdump(Serial);
+  // for (size_t i = 0; i < UniqueIDsize; i++)
+	// {
+	// 	if (UniqueID[i] < 0x10)
+	// 		Serial.print("0");
+	// 	Serial.print(UniqueID[i], HEX);
+  //   Serial.print(UniqueID[i], );
+	// 	Serial.print(" ");
+	// }
+
+  // if(UniqueID[8] == 25){
+  //   Serial.println(F("Sensor B"));
+  //   strcpy(BLENAME, "m0");
+  //   SLEEP_TIME = 25000;
+  // }
+  // if(UniqueID[8] == 16){
+  //   Serial.println(F("Sensor N"));
+  //   strcpy(BLENAME, "m1");
+  //   SLEEP_TIME = 20000;
+  // }
+  
   Serial.println(F("Start FSM"));
   setupStateMachine();
   //switch from INIT to SETUP

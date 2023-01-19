@@ -7,8 +7,9 @@ void readBLE(){
     outputBLE = BLESerial.readStringUntil('\n');
     Serial.println(outputBLE);
     if(strstr(stateMachine.ActiveStateName(), "S_BLE") || 
-      strstr(stateMachine.ActiveStateName(), "BLE_M")){
-      checkOkBLE(); // check only if in right state...
+      strstr(stateMachine.ActiveStateName(), "BLE_M")  || 
+      strstr(stateMachine.ActiveStateName(), "BLE_C")){
+      checkOkBLE();
       checkResetBLE();
     }
 
