@@ -14,18 +14,18 @@ void readSerial(){
     }
 
     if (strstr(str.c_str(), FORCE_TAG)){
-      Serial.println(F("WARNING: NB-IoT not available"));
+      Serial.println(F("WARN:no NBIoT"));
       forceBLE = true;
     }
 
     if (strstr(str.c_str(), BLE_TAG)){
-      Serial.print(F("BLE Stream: "));
+      Serial.print(F("BLE: "));
       str = strremove(str.c_str(), BLE_TAG);
       BLESerial.print(str);
     }
 
     if (strstr(str.c_str(), NBIOT_TAG)){
-      Serial.print(F("NB-IoT Stream: "));
+      Serial.print(F("NBIoT: "));
       str = strremove(str.c_str(), NBIOT_TAG);
       str = strcat(str.c_str(), "\r\n");
       NBIOTSerial.write(str.c_str());
@@ -45,19 +45,25 @@ char *strremove(char *str, const char *sub) {
     return str;
 }
 
-void createIdDatagram(){
+String createIdDatagram(){
+  String stringIdDatagram;
+  char strId[4];
+
   if (idDatagram < 10) {
-    stringIdDatagram = "00" + String(idDatagram);
+    sprintf(strId,"00%d",idDatagram);
+    strcat(stringIdDatagram.c_str(), strId);
   }
   if (idDatagram >= 10 && idDatagram < 100) {
-    stringIdDatagram = "0" + String(idDatagram);
+    sprintf(strId,"0%d",idDatagram);
+    strcat(stringIdDatagram.c_str(), strId);
   }
   if (idDatagram >= 100 && idDatagram < 1000) {
-    stringIdDatagram = String(idDatagram);
+    strcat(stringIdDatagram.c_str(), strId);
   }
   if (idDatagram >= 1000){
-    stringIdDatagram = 999;
+    strcpy(stringIdDatagram.c_str(), "999");
     idDatagram = 0;
   }
   idDatagram++;
+  return stringIdDatagram;
 }

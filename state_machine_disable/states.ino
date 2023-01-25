@@ -14,13 +14,13 @@ void resetInterfaces() {
 
 void setupNBIoTConnection() {
   #ifdef NONBMODULE  
-    Serial.println(F("NB-IOT setup skipped")); 
+    Serial.println(F("NB stp skip")); 
     okNBIOTList = NUM_SETUPOPERATIONS_NBIOT + 2;
   #endif
 
   if (nbIoToldState != okNBIOTList) {
     if (okNBIOTList < NUM_SETUPOPERATIONS_NBIOT) {
-      cmdNBIOT = strcat(setupIoTList[okNBIOTList].c_str(), "\r\n");
+      cmdNBIOT = strcat(setupIoTList[okNBIOTList], "\r\n");
       Serial.println(cmdNBIOT);
       NBIOTSerial.write(cmdNBIOT.c_str());
     }
@@ -99,7 +99,7 @@ void onMaster() {
 }
 
 void bleConnected() {
-  Serial.print(F("Sending: "));
+  Serial.print(F("Snd: "));
   Serial.println(payloadHex);
   BLESerial.write(payloadHex);
   for (i = 0; i < 5; i++){
@@ -129,7 +129,7 @@ void bleDisc(){
   oldStateBle = -1;
   connectedState = false;
   // disconnectedState = false;
-  Serial.println(F("Discon"));
+  Serial.println(F("Disc"));
   BLESerial.write("AT"); //go to disconnect loop, no sleep direct
   // sleepState = true;
 }

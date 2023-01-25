@@ -1,8 +1,7 @@
 
-
 void checkResetNBIOT() {
   if (strstr(outputNBIOT.c_str(), RESET_NBIOT_TAG)) {
-    Serial.println(F("NBIoT Reset done"));
+    Serial.println(F("NB Rst"));
     resetState = false;
     setupBLEState = true;
   }
@@ -10,7 +9,7 @@ void checkResetNBIOT() {
 
 void checkConnectionNBIOT() {
     if (strstr(outputNBIOT.c_str(), CEREG_NBIOT_TAG)) {
-      Serial.println(F("Conn!"));
+      Serial.println(F("Conn"));
       delay(200);
       NBIOTSerial.write(CGATTcmd);
       // TODO: check if CGATT returns 1
@@ -35,13 +34,13 @@ void onSendNBIOT(){
 
 void checkSendNBIOT(){
   if (strstr(outputNBIOT.c_str(), "0,10")){
-    Serial.println(F("Sent"));
+    Serial.println(F("Snt"));
     onSendNBIOT();
   }
 }
 
 void prepareConnBLE(){
-  Serial.println(F("ERROR: RSRQ low... Set up master"));  
+  Serial.println(F("ERR: RSRQ low - master"));  
   forceBLE = false; 
   masterState = true; 
 }
@@ -49,15 +48,15 @@ void prepareConnBLE(){
 
 void checkRSSI() {
   if (strstr(outputNBIOT.c_str(), "RSRQ")) {
-    strcpy(rsrq, strremove(strremove(outputNBIOT.c_str(), "\"RSRQ\",-"), "\r"));
-    rsrqInt = atoi(rsrq);  // convert rsrq in int 
+    char current_rsrq[4] = "";
+    strcpy(current_rsrq, strremove(strremove(outputNBIOT.c_str(), "\"RSRQ\",-"), "\r"));
+    current_rsrq[4] = '\0';
     #ifdef NONBMODULE  
-      Serial.println(F("NB-IOT RSSI skipped")); 
-    rsrqInt = 129;
+      Serial.println(F("RSSI skp")); 
+      strcpy(current_rsrq, "129");
     #endif
-    Serial.println(rsrqInt);
-
-    createPayload();
+    uint8_t rsrqInt = atoi(current_rsrq);  // convert rsrq in int 
+    createPayload(current_rsrq);
     createHexPayload();
     createMessage();
 
@@ -66,7 +65,7 @@ void checkRSSI() {
     } 
     if(!forceBLE){
       if (rsrqInt < RSRQ_THRESHOLD && rsrqInt > 0){  
-        Serial.println(F("Sending"));
+        Serial.println(F("Snd"));
         readyToSendNBIOT = true;
       } else {
         prepareConnBLE();
@@ -77,13 +76,12 @@ void checkRSSI() {
 
 
 
-void createPayload(){
+void createPayload(char *rsrq){
   memset(payload, 0, sizeof payload);
-  createIdDatagram();
-
+  String idDatagram = createIdDatagram();
   strcat(payload, BLENAME);
   strcat(payload, "A");
-  strcat(payload, stringIdDatagram.c_str());
+  strcat(payload, idDatagram.c_str());
   strcat(payload, "A");
   strcat(payload, rsrq);
 
@@ -92,7 +90,7 @@ void createPayload(){
 
 void createHexPayload(){
   memset(payloadHex, 0, sizeof payloadHex);
-  payloadLen = strlen(payload);
+  uint8_t payloadLen = strlen(payload);
   for (i = 0, j = 0; i < payloadLen; ++i, j += 2) {
     sprintf(payloadHex + j, "%02x", payload[i] & 0xff);
   }
@@ -100,8 +98,8 @@ void createHexPayload(){
 
 void createMessage() {
   memset(TRANScmd, 0, sizeof TRANScmd);
-  memset(buffer, 0, sizeof buffer);
-  strcat(TRANScmd, "AT+NSOST=0,\"131.175.120.22\",8883,");
+  char buffer[5] = "";
+  strcat(TRANScmd, FIXED_DATAGRAM);
   snprintf(buffer, sizeof(buffer), "%d", strlen(payloadHex)/2); 
   strcat(TRANScmd, buffer);
   strcat(TRANScmd, ",\"");
