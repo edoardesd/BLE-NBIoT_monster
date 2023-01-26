@@ -6,9 +6,10 @@ void readBLE(){
     
     outputBLE = BLESerial.readStringUntil('\n');
     Serial.println(outputBLE);
-    if(strstr(stateMachine.ActiveStateName(), "S_BLE") || 
+    if(strstr(stateMachine.ActiveStateName(), "BLE_S") || 
       strstr(stateMachine.ActiveStateName(), "BLE_M")  || 
-      strstr(stateMachine.ActiveStateName(), "BLE_C")){
+      strstr(stateMachine.ActiveStateName(), "BLE_C")  || 
+      strstr(stateMachine.ActiveStateName(), "BLE_DISC")){
       checkOkBLE();
       checkResetBLE();
     }
@@ -16,6 +17,10 @@ void readBLE(){
     if(strstr(stateMachine.ActiveStateName(), "BLE_M")){
       checkDiscovery();
       checkConnection();
+    }
+
+    if(strstr(stateMachine.ActiveStateName(), "BLE_DISC")){
+      checkDisconnBLE();
     }
 
     if(!resetState || !setupBLEState || !setupNBIOTState){
@@ -34,7 +39,7 @@ void readNBIOT() {
       checkResetNBIOT();
     }
 
-    if(strstr(stateMachine.ActiveStateName(), "S_NB")){
+    if(strstr(stateMachine.ActiveStateName(), "NB")){
       checkOkNBIOT();
       checkConnectionNBIOT();
     }

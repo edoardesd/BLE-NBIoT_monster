@@ -6,6 +6,8 @@
 
 #include "state_machine_disable.h"
 #include "fsm.h"
+#include "serial.h"
+#include "const_cmd.h"
 
 void setup() {
   pinMode(powerPin, OUTPUT);

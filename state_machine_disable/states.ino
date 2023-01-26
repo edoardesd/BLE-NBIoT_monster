@@ -113,16 +113,18 @@ void bleConnected() {
   
 }
 
-// void bleDiscLoop(){
-//   if (bleOperationIndex < NUM_DISCONNOPERATIONS_BLE) {
-  //   if (oldStateBle != bleOperationIndex) { 
-  //     cmd_ble = disconnectionBLEList[bleOperationIndex];
-  //     Serial.println(cmd_ble);
-  //     BLESerial.write(cmd_ble.c_str());
-  //     oldStateBle = bleOperationIndex;
-  //   }
-  // }
-// }
+void bleDiscLoop(){
+  if(isLostConn){
+    if (bleOperationIndex < NUM_DISCONNOPERATIONS_BLE) {
+      if (oldStateBle != bleOperationIndex) { 
+        cmd_ble = disconnectionBLEList[bleOperationIndex];
+        Serial.println(cmd_ble);
+        BLESerial.write(cmd_ble.c_str());
+        oldStateBle = bleOperationIndex;
+      }
+    }
+  }
+}
 
 void bleDisc(){
   bleOperationIndex = 0;
@@ -130,7 +132,8 @@ void bleDisc(){
   connectedState = false;
   // disconnectedState = false;
   Serial.println(F("Disc"));
-  BLESerial.write("AT"); //go to disconnect loop, no sleep direct
+  BLESerial.write("AT");
+  delay(200); //go to disconnect loop, no sleep direct
   // sleepState = true;
 }
 

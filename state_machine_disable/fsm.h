@@ -1,3 +1,16 @@
+/***** FINITE STATE MACHINE VARS *****/ 
+YA_FSM stateMachine;  // Create new FSM
+
+bool resetState = false;
+bool setupBLEState = false;
+bool setupNBIOTState = false;
+bool sleepState = false;
+bool masterState = false;
+bool readyToSendNBIOT = false;
+bool connectedState = false;
+bool forwardState = false;
+bool disconnectedState = false;
+bool isLostConn = false; 
 
 enum State { INIT,
              RESET,
@@ -9,11 +22,11 @@ enum State { INIT,
              BLE_CONNECTED,
              BLE_DISCONNECT,
              NBIOT_FORWARD
-             };                                                                                                         // State Alias
+             };                                                                                                     
 const char *const stateName[] PROGMEM = { "INT",
                                           "RST",
-                                          "S_BLE",
-                                          "S_NB",
+                                          "BLE_S",
+                                          "NB_S",
                                           "SLP",
                                           "WAKE",
                                           "BLE_M",

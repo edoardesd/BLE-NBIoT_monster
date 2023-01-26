@@ -7,7 +7,7 @@ void setupStateMachine() {
   stateMachine.AddState(stateName[WAKEUP], onWakeUp, sendNBIOT, onExit);
   stateMachine.AddState(stateName[BLE_MASTER], onEnter, onMaster, onExit);
   stateMachine.AddState(stateName[BLE_CONNECTED], CONNECTION_TIME, bleConnected, nullptr, onExit);
-  stateMachine.AddState(stateName[BLE_DISCONNECT], bleDisc, nullptr, onExit);
+  stateMachine.AddState(stateName[BLE_DISCONNECT], bleDisc, bleDiscLoop, onExit);
   stateMachine.AddState(stateName[NBIOT_FORWARD], forwardNBIOT, sendNBIOT, onExit);
 
 
@@ -23,6 +23,9 @@ void setupStateMachine() {
   stateMachine.AddTransition(BLE_MASTER, BLE_CONNECTED, connectedState);
   stateMachine.AddTransition(BLE_DISCONNECT, SLEEP, sleepState);
   stateMachine.AddTransition(BLE_MASTER, BLE_DISCONNECT, disconnectedState);
+  // stateMachine.AddTransition(BLE_CONNECTED, BLE_DISCONNECT, disconnectedState);
+
+
 
 
 

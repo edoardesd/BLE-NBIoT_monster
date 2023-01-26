@@ -6,15 +6,15 @@ void checkOkBLE(){
   }
 }
 
-// void checkDisconnBLE(){
-//   if(!resetState){
-//     if(strstr(outputBLE.c_str(), "OK+LOST")){
-//       Serial.println(F("BLE DISCONNECTED, go with the next one"));
-//       digitalWrite(LED_BUILTIN, LOW);
-//       bleOperationIndex++;
-//     }
-//   }
-// }
+void checkDisconnBLE(){
+  if(!resetState){
+    if(strstr(outputBLE.c_str(), "OK+LOST")){
+      Serial.println(F("BLE DISCON"));
+      digitalWrite(LED_BUILTIN, LOW);
+      isLostConn = true;
+    }
+  }
+}
 
 void checkResetBLE(){
   if(strstr(outputBLE.c_str(), "OK+RESET")) {
@@ -23,20 +23,23 @@ void checkResetBLE(){
     digitalWrite(LED_BUILTIN, LOW);
 
 
-  if(strstr(stateMachine.ActiveStateName(), "S_BLE")){
+  if(strstr(stateMachine.ActiveStateName(), "BLE_S")){
     bleOperationIndex = 0;
     oldStateBle = -1;
     setupBLEState = false;
     setupNBIOTState = true;
   }
 
-  //connected
-    //  if(strstr(stateMachine.ActiveStateName(), "BLE_C")){
-    // bleOperationIndex = 0;
-    // oldStateBle = -1;
-    // isconnectedState = false;
-    // sleepState = true;
-    // }
+  // discconnected
+     if(strstr(stateMachine.ActiveStateName(), "BLE_DISC")){
+      bleOperationIndex = 0;
+      oldStateBle = -1;
+      isLostConn = false;
+      disconnectedState = false;
+      sleepState = true;
+      Serial.println(F("DisconnDone"));
+
+    }
   }
 }
 
@@ -57,12 +60,12 @@ void checkDiscovery(){
 
     if(strstr(mac, MAC_TO_CONNECT)){
       Serial.println(F("MAC fnd"));
-      macFound = true;
+      mac_found = true;
     }
   }
 
   if(strstr(outputBLE.c_str(), "OK+DISCE")){
-    if(macFound){
+    if(mac_found){
       char connectCMD[13];
       strcat(connectCMD, "AT+CON");
       strcat(connectCMD, MAC_TO_CONNECT);
@@ -71,6 +74,7 @@ void checkDiscovery(){
     }else{
       Serial.println(F("WARN no Mac "));
       masterState = false;
+      isLostConn = true;
       disconnectedState = true;
   }
 }
