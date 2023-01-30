@@ -50,34 +50,63 @@ void checkMessageBLE(){
   }
 }
 
-void checkDiscovery(){
-  if(strstr(outputBLE.c_str(), "OK+DISC")){
-    char mac[13];
-    char *mac_start = strchr(outputBLE.c_str(), ':');
-    uint8_t index = (uint8_t)(mac_start - outputBLE.c_str()+1);
-    strncpy(mac, &outputBLE.c_str()[index], 12);
-    mac[12]='\0';
+void electMAC(){
+  strcpy(designatedMAC, devices_record[selectDevice()].dev_mac);
+    // Serial.print("Get dev ");
+    // Serial.println(designatedMAC);
 
-    if(strstr(mac, MAC_TO_CONNECT)){
+    if(strstr(designatedMAC, MAC_TO_CONNECT)){
       Serial.println(F("MAC fnd"));
       mac_found = true;
     }
-  }
+}
 
+void checkDiscovery(){
   if(strstr(outputBLE.c_str(), "OK+DISCE")){
+    readStruct();
+    electMAC();
+    
     if(mac_found){
-      char connectCMD[13];
-      strcat(connectCMD, "AT+CON");
-      strcat(connectCMD, MAC_TO_CONNECT);
       Serial.println(connectCMD);
       BLESerial.write(connectCMD);
+      mac_found = false;
     }else{
       Serial.println(F("WARN no Mac "));
       masterState = false;
       isLostConn = true;
       disconnectedState = true;
   }
-}
+  }
+
+  if(read_next){
+    char name[10];
+    getName((char*)outputBLE.c_str(), name);
+    split(name, id, rssi, transmissions);
+    Serial.print(mac);
+    Serial.print(" ");    
+    Serial.print(id);
+    Serial.print(" ");
+    Serial.print(rssi);
+    Serial.print(" ");
+    Serial.println(transmissions);
+    storeInStruct(mac, id, atoi(rssi), atoi(transmissions));
+  } 
+  else {
+    read_next = getMac((char*)outputBLE.c_str(), mac);
+  }
+  // if(strstr(outputBLE.c_str(), "OK+DISC") || std::strstr(line, "OK+DIS1:")){
+  //   char mac[13];
+  //   char *mac_start = strchr(outputBLE.c_str(), ':');
+  //   uint8_t index = (uint8_t)(mac_start - outputBLE.c_str()+1);
+  //   strncpy(mac, &outputBLE.c_str()[index], 12);
+  //   mac[12]='\0';
+
+  //   if(strstr(mac, MAC_TO_CONNECT)){
+  //     Serial.println(F("MAC fnd"));
+  //     mac_found = true;
+  //   }
+  // }
+
 }
 
 void checkConnection(){

@@ -15,7 +15,12 @@ void readSerial(){
 
     if (strstr(str.c_str(), FORCE_TAG)){
       Serial.println(F("WARN:no NBIoT"));
-      forceBLE = true;
+      forceNBIOT = true;
+    }
+
+    if (strstr(str.c_str(), RELEASE_TAG)){
+       Serial.println(F("WARN:actv NBIoT"));
+      forceNBIOT = false;
     }
 
     if (strstr(str.c_str(), BLE_TAG)){

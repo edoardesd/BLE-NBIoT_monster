@@ -24,11 +24,6 @@ void setupStateMachine() {
   stateMachine.AddTransition(BLE_DISCONNECT, SLEEP, sleepState);
   stateMachine.AddTransition(BLE_MASTER, BLE_DISCONNECT, disconnectedState);
   // stateMachine.AddTransition(BLE_CONNECTED, BLE_DISCONNECT, disconnectedState);
-
-
-
-
-
   stateMachine.AddTimedTransition(SLEEP, WAKEUP);
   stateMachine.AddTimedTransition(BLE_CONNECTED, BLE_DISCONNECT);
 }

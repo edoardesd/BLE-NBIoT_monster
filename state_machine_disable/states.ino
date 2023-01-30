@@ -46,6 +46,7 @@ void setupBlueToothConnection() {
       if(strstr(cmd_ble.c_str(), "NAME")){
         strcat(cmd_ble.c_str(), BLENAME);
         strcat(cmd_ble.c_str(), "-121");
+        strcat(cmd_ble.c_str(), "-11");
       }
       Serial.println(cmd_ble);
       BLESerial.write(cmd_ble.c_str());
@@ -55,7 +56,6 @@ void setupBlueToothConnection() {
 }
 
 void onWakeUp(){
-  Serial.println(SLEEP_TIME);
   NBIOTSerial.write(STATScmd);
 }
 
@@ -99,6 +99,7 @@ void onMaster() {
 }
 
 void bleConnected() {
+
   Serial.print(F("Snd: "));
   Serial.println(payloadHex);
   BLESerial.write(payloadHex);
@@ -108,9 +109,7 @@ void bleConnected() {
     digitalWrite(LED_BUILTIN, LOW);
     delay(100);
   }
-  // memset(payloadHex, 0, sizeof payloadHex);
 
-  
 }
 
 void bleDiscLoop(){

@@ -41,7 +41,6 @@ void checkSendNBIOT(){
 
 void prepareConnBLE(){
   Serial.println(F("ERR: RSRQ low - master"));  
-  forceBLE = false; 
   masterState = true; 
 }
 
@@ -60,12 +59,12 @@ void checkRSSI() {
     createHexPayload();
     createMessage();
 
-    if(forceBLE){
+    if(forceNBIOT){
       prepareConnBLE();
     } 
-    if(!forceBLE){
+    if(!forceNBIOT){
       if (rsrqInt < RSRQ_THRESHOLD && rsrqInt > 0){  
-        Serial.println(F("Snd"));
+        Serial.println(F("Ready to snd"));
         readyToSendNBIOT = true;
       } else {
         prepareConnBLE();
@@ -84,8 +83,6 @@ void createPayload(char *rsrq){
   strcat(payload, idDatagram.c_str());
   strcat(payload, "A");
   strcat(payload, rsrq);
-
-  // Serial.println(payload);
 }
 
 void createHexPayload(){

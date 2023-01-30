@@ -8,7 +8,7 @@
 #define CONNECTION_TIME 10000
 #define RSRQ_THRESHOLD 250
 
-bool forceBLE = false;
+bool forceNBIOT = true;
 
 int SLEEP_TIME = 25000;
 
@@ -25,6 +25,7 @@ uint8_t i = 0;
 uint8_t j = 0;
 
 /*****  *****/ 
+char mac[13];
 char BLENAME[3] = "mx";
 char TRANScmd[50] = "";
 char payload[15] = "";
@@ -33,6 +34,8 @@ char forwardPayload[22];
 char MAC_TO_CONNECT[13];
 uint8_t idDatagram = 0;
 bool mac_found = false;
+char connectCMD[19] = "AT+CON";
+
 
 const char*  setupIoTList[NUM_SETUPOPERATIONS_NBIOT] = { "AT+CMEE=1", "AT+CFUN=1", "AT+CGDCONT=1,\"IP\",\"nb.inetd.gdsp\"", "AT+CEREG=2", "AT+COPS=1,2,\"22210\"" };
 const char* setupBLEList[NUM_SETUPOPERATIONS_BLE] = { "AT+IMME0", "AT+ROLE0", "AT+NAME", "AT+NOTI1", "AT+NOTP1", "AT+ADTY0", "AT+ADVI1", "AT+SHOW3", "AT+RESET"};
