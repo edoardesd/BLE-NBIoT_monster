@@ -72,3 +72,14 @@ String createIdDatagram(){
   idDatagram++;
   return stringIdDatagram;
 }
+
+void createName(char *name){
+  char strTrans[4];
+  strcat(name, BLENAME);
+  strcat(name, "-121");
+  strcat(name, "-");
+  sprintf(strTrans,"%d",totalTransmissions);
+  strcat(name, strTrans);
+  Serial.println(name);
+  // return newName;
+}

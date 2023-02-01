@@ -4,16 +4,16 @@
 
 void split(char *str, char *output1, char *output2, char *output3){
     char * pch;
-    int i = 0;
+    uint8_t k = 0;
     // Serial.println("Splitting string  into tokens:");
     pch = strtok (str,"-");
     while (pch != NULL)
     {
-        if (i == 0)
+        if (k == 0)
             strcpy(output1, pch);
-        if (i == 1)
+        if (k == 1)
             strcpy(output2, pch);
-        if (i == 2)
+        if (k == 2)
             strcpy(output3, pch);
         pch = strtok (NULL, "-");
         i++;
@@ -32,37 +32,38 @@ char designatedMAC[13];
 struct BleDevice{
     char dev_mac[13];
     char dev_id[3];
-    int dev_rssi;
-    int dev_transmissions;
+    uint8_t dev_rssi;
+    uint8_t dev_transmissions;
 };
 
-struct BleDevice devices_record[3];
+struct BleDevice devices_record[5];
 
 void readStruct(){
     for (i = 0; i < dev_index; i++){
-        Serial.println(devices_record[i].dev_rssi);
+        Serial.println(devices_record[i].dev_mac);
     }
 }
 
-int getScore(int rssi, int transmissions){
+int getScore(uint8_t rssi, uint8_t transmissions){
     return ALPHA*rssi + BETA*transmissions; 
 }
 
-int selectDevice(){
-    int selectedDevice = 9;
+uint8_t selectDevice(){
+    uint8_t selectedDevice = 9;
     int min_score = 900;
     for(i = 0; i<dev_index; i++){
         if(getScore(devices_record[i].dev_rssi, devices_record[i].dev_transmissions) < min_score){
             if (devices_record[i].dev_transmissions < 50){
                 selectedDevice = i;
+                min_score = getScore(devices_record[i].dev_rssi, devices_record[i].dev_transmissions);
             }
         }
     }
-
+    Serial.println(selectedDevice);
     return selectedDevice;
 }
 
-void storeInStruct(char *curr_mac, char* curr_id, int curr_rssi, int curr_transmission){    
+void storeInStruct(char *curr_mac, char* curr_id, uint8_t curr_rssi, uint8_t curr_transmission){    
     // Serial.println(curr_mac);
     strcpy(devices_record[dev_index].dev_mac, curr_mac);
     // Serial.println(devices_record[dev_index].dev_mac);
@@ -96,13 +97,13 @@ bool getMac(char *line, char *current_mac){
     }
 }
 
-int getName(char *line, char *current_name){
+bool getName(char *line, char *current_name){
     if(strstr(line, "OK+NAME")){
         getString(line, current_name, 10);
         // Serial.println(current_name);
-        return 1; 
+        return true; 
     } else {
-        return 0;
+        return false;
     }
 }
 

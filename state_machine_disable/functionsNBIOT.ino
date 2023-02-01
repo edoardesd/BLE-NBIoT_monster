@@ -25,6 +25,9 @@ void checkOkNBIOT(){
 }
 
 void onSendNBIOT(){
+  wakeState = false;
+  totalTransmissions++;
+  Serial.println(totalTransmissions);
   if(strlen(forwardPayload) > 1){
     forwardState = true;
   } else {
@@ -40,7 +43,7 @@ void checkSendNBIOT(){
 }
 
 void prepareConnBLE(){
-  Serial.println(F("ERR: RSRQ low - master"));  
+  Serial.println(F("ERR RSRQ low"));  
   masterState = true; 
 }
 
@@ -55,6 +58,7 @@ void checkRSSI() {
       strcpy(current_rsrq, "129");
     #endif
     uint8_t rsrqInt = atoi(current_rsrq);  // convert rsrq in int 
+    Serial.println(rsrqInt);
     createPayload(current_rsrq);
     createHexPayload();
     createMessage();
@@ -72,8 +76,6 @@ void checkRSSI() {
     }
 }
 }
-
-
 
 void createPayload(char *rsrq){
   memset(payload, 0, sizeof payload);

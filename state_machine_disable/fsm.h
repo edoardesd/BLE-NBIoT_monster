@@ -5,6 +5,7 @@ bool resetState = false;
 bool setupBLEState = false;
 bool setupNBIOTState = false;
 bool sleepState = false;
+bool wakeState = false;
 bool masterState = false;
 bool readyToSendNBIOT = false;
 bool connectedState = false;

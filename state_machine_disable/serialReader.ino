@@ -23,7 +23,7 @@ void readBLE(){
       checkDisconnBLE();
     }
 
-    if(!resetState || !setupBLEState || !setupNBIOTState){
+    if(!resetState || !setupBLEState || !setupNBIOTState || !wakeState){
       // check message and react
       checkMessageBLE();
     }

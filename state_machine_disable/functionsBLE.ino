@@ -9,7 +9,7 @@ void checkOkBLE(){
 void checkDisconnBLE(){
   if(!resetState){
     if(strstr(outputBLE.c_str(), "OK+LOST")){
-      Serial.println(F("BLE DISCON"));
+      Serial.println(F("BLE DISC"));
       digitalWrite(LED_BUILTIN, LOW);
       isLostConn = true;
     }
@@ -37,7 +37,7 @@ void checkResetBLE(){
       isLostConn = false;
       disconnectedState = false;
       sleepState = true;
-      Serial.println(F("DisconnDone"));
+      Serial.println(F("DisconDone"));
 
     }
   }
@@ -50,26 +50,28 @@ void checkMessageBLE(){
   }
 }
 
-void electMAC(){
+bool electMAC(){
   strcpy(designatedMAC, devices_record[selectDevice()].dev_mac);
-    // Serial.print("Get dev ");
-    // Serial.println(designatedMAC);
+  dev_index = 0;
 
-    if(strstr(designatedMAC, MAC_TO_CONNECT)){
-      Serial.println(F("MAC fnd"));
-      mac_found = true;
-    }
+  if(strstr(designatedMAC, MAC_TO_CONNECT)){
+    Serial.println(F("MAC fnd"));
+    return true;
+    // mac_found = true;
+  } else {
+    return false;
+  }
 }
 
 void checkDiscovery(){
   if(strstr(outputBLE.c_str(), "OK+DISCE")){
     readStruct();
-    electMAC();
+    // electMAC();
     
-    if(mac_found){
+    if(electMAC()){
       Serial.println(connectCMD);
       BLESerial.write(connectCMD);
-      mac_found = false;
+      // mac_found = false;
     }else{
       Serial.println(F("WARN no Mac "));
       masterState = false;
@@ -79,16 +81,16 @@ void checkDiscovery(){
   }
 
   if(read_next){
-    char name[10];
+    char name[10] = "";
     getName((char*)outputBLE.c_str(), name);
     split(name, id, rssi, transmissions);
-    Serial.print(mac);
-    Serial.print(" ");    
-    Serial.print(id);
-    Serial.print(" ");
-    Serial.print(rssi);
-    Serial.print(" ");
-    Serial.println(transmissions);
+    // Serial.print(mac);
+    // Serial.print(" ");    
+    // Serial.print(id);
+    // Serial.print(" ");
+    // Serial.print(rssi);
+    // Serial.print(" ");
+    // Serial.println(transmissions);
     storeInStruct(mac, id, atoi(rssi), atoi(transmissions));
   } 
   else {
@@ -111,7 +113,7 @@ void checkDiscovery(){
 
 void checkConnection(){
   if(strstr(outputBLE.c_str(), "OK+CONNA")){
-    Serial.println(F("Conn"));
+    Serial.println(F("Con"));
     bleOperationIndex = 0;
     oldStateBle = -1;
     masterState = false;

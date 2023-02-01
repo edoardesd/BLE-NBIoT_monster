@@ -33,7 +33,7 @@ char payloadHex[22];
 char forwardPayload[22];
 char MAC_TO_CONNECT[13];
 uint8_t idDatagram = 0;
-bool mac_found = false;
+int totalTransmissions = 2;
 char connectCMD[19] = "AT+CON";
 
 
@@ -44,9 +44,4 @@ const char*  disconnectionBLEList[NUM_DISCONNOPERATIONS_BLE] = {"AT+IMME0", "AT+
 
 String cmdNBIOT;
 String cmd_ble;
-
-// char *strremove(char *str, const char *sub);
-// void readSerial();
-// void readBLE();
-// void readNBIOT();
 

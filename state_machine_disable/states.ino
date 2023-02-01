@@ -44,9 +44,12 @@ void setupBlueToothConnection() {
     if (bleOperationIndex < NUM_SETUPOPERATIONS_BLE) {  //Ordinary operations
       cmd_ble = setupBLEList[bleOperationIndex];
       if(strstr(cmd_ble.c_str(), "NAME")){
-        strcat(cmd_ble.c_str(), BLENAME);
-        strcat(cmd_ble.c_str(), "-121");
-        strcat(cmd_ble.c_str(), "-11");
+
+        createName(cmd_ble.c_str());
+        // strcat(cmd_ble.c_str(), BLENAME);
+        // strcat(cmd_ble.c_str(), "-121");
+        // strcat(cmd_ble.c_str(), "-");
+        // strcat(cmd_ble.c_str(), String(totalTransmissions).c_str());
       }
       Serial.println(cmd_ble);
       BLESerial.write(cmd_ble.c_str());
@@ -56,6 +59,7 @@ void setupBlueToothConnection() {
 }
 
 void onWakeUp(){
+  wakeState = true;
   NBIOTSerial.write(STATScmd);
 }
 
@@ -78,11 +82,17 @@ void forwardNBIOT(){
   memset(forwardPayload, 0, sizeof forwardPayload);
   Serial.println(payloadHex);
   createMessage();
-  Serial.println(F("Frwardng"));
+  Serial.println(F("Frward"));
   readyToSendNBIOT = true;
 }
 
 void onSleep(){
+  char newName[20] = "AT+NAME";
+  Serial.println(newName);
+  createName(newName);
+  BLESerial.write(newName);
+  delay(200);
+  BLESerial.write("AT+RESET");
   sleepState = false;
   forwardState = false;
 }
