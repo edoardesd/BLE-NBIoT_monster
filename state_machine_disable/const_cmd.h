@@ -11,4 +11,4 @@ const PROGMEM char *const DGRAMcmd = "AT+NSOCR=\"DGRAM\",17,3365,1\r\n";
 const PROGMEM char *const STATScmd = "AT+NUESTATS\r\n";
 const PROGMEM char *const CGATTcmd = "AT+CGATT?\r\n";
 
-const PROGMEM char *const separator = "--------";
+const PROGMEM char *const separator = "-";

@@ -1,11 +1,11 @@
-// #define MAIN
-#define NONBMODULE
+
+// #define NONBMODULE
 
 #define NUM_SETUPOPERATIONS_NBIOT 5
 #define NUM_SETUPOPERATIONS_BLE 9
 #define NUM_MASTEROPERATIONS_BLE 3
 #define NUM_DISCONNOPERATIONS_BLE 3
-#define CONNECTION_TIME 10000
+#define CONNECTION_TIME 3000
 #define RSRQ_THRESHOLD 250
 
 bool forceNBIOT = true;
@@ -26,22 +26,23 @@ uint8_t j = 0;
 
 /*****  *****/ 
 char mac[13];
-char BLENAME[3] = "mx";
+char BLENAME[3];
 char TRANScmd[50] = "";
 char payload[15] = "";
 char payloadHex[22];
 char forwardPayload[22];
 char MAC_TO_CONNECT[13];
 uint8_t idDatagram = 0;
-int totalTransmissions = 2;
+uint8_t totalTransmissions = 1;
+char current_rsrq[4] = "180";
 char connectCMD[19] = "AT+CON";
 
 
-const char*  setupIoTList[NUM_SETUPOPERATIONS_NBIOT] = { "AT+CMEE=1", "AT+CFUN=1", "AT+CGDCONT=1,\"IP\",\"nb.inetd.gdsp\"", "AT+CEREG=2", "AT+COPS=1,2,\"22210\"" };
-const char* setupBLEList[NUM_SETUPOPERATIONS_BLE] = { "AT+IMME0", "AT+ROLE0", "AT+NAME", "AT+NOTI1", "AT+NOTP1", "AT+ADTY0", "AT+ADVI1", "AT+SHOW3", "AT+RESET"};
+const char*  setupIoTList[NUM_SETUPOPERATIONS_NBIOT] = { "AT+CMEE=1\r\n", "AT+CFUN=1\r\n", "AT+CGDCONT=1,\"IP\",\"nb.inetd.gdsp\"\r\n", "AT+CEREG=2\r\n", "AT+COPS=1,2,\"22210\"\r\n" };
+char* setupBLEList[NUM_SETUPOPERATIONS_BLE] = {"AT+IMME0", "AT+ROLE0", "AT+NOTI1", "AT+NOTP1", "AT+ADTY0", "AT+ADVI1", "AT+NAMEmx-150-9", "AT+SHOW3", "AT+RESET"};
 const char*  masterBLEList[NUM_MASTEROPERATIONS_BLE] = {"AT+IMME1", "AT+ROLE1", "AT+DISC?" };
 const char*  disconnectionBLEList[NUM_DISCONNOPERATIONS_BLE] = {"AT+IMME0", "AT+ROLE0", "AT+RESET"};
 
-String cmdNBIOT;
-String cmd_ble;
+// String cmdNBIOT;
+// String cmd_ble;
 

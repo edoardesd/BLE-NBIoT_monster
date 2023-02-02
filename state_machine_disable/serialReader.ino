@@ -1,7 +1,7 @@
 
 
 void readBLE(){
-  if (BLESerial.available()) {
+  if(BLESerial.available()) {
     Serial.print(F("HM10: "));
     
     outputBLE = BLESerial.readStringUntil('\n');
@@ -21,6 +21,11 @@ void readBLE(){
 
     if(strstr(stateMachine.ActiveStateName(), "BLE_DISC")){
       checkDisconnBLE();
+    }
+
+    if(strstr(stateMachine.ActiveStateName(), "SLP")){
+      checkName();
+      checkResetBLE();
     }
 
     if(!resetState || !setupBLEState || !setupNBIOTState || !wakeState){

@@ -1,12 +1,12 @@
 void setupId(){
-  UniqueIDdump(Serial);
+  // UniqueIDdump(Serial);
 
   if(UniqueID[8] == 25){
     Serial.println(F("Sns B"));
     strcpy(BLENAME, "m0");
     strcpy(MAC_TO_CONNECT, "94A9A83B7B35");
     getConnectString();
-    SLEEP_TIME = 10000;
+    SLEEP_TIME = 18000;
     forceNBIOT = true;
   }
   if(UniqueID[8] == 22){

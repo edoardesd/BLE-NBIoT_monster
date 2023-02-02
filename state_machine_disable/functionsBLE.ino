@@ -6,10 +6,16 @@ void checkOkBLE(){
   }
 }
 
+void checkName(){
+  if(strstr(outputBLE.c_str(), "OK+Set:m")){
+    BLESerial.write("AT+RESET");    
+  }
+}
+
 void checkDisconnBLE(){
   if(!resetState){
-    if(strstr(outputBLE.c_str(), "OK+LOST")){
-      Serial.println(F("BLE DISC"));
+    if(strstr(outputBLE.c_str(), "OK+LOST") || strstr(outputBLE.c_str(), "OK")){
+      // Serial.println(F("BLE DISC"));
       digitalWrite(LED_BUILTIN, LOW);
       isLostConn = true;
     }
@@ -84,13 +90,13 @@ void checkDiscovery(){
     char name[10] = "";
     getName((char*)outputBLE.c_str(), name);
     split(name, id, rssi, transmissions);
-    // Serial.print(mac);
-    // Serial.print(" ");    
-    // Serial.print(id);
-    // Serial.print(" ");
-    // Serial.print(rssi);
-    // Serial.print(" ");
-    // Serial.println(transmissions);
+    Serial.print(mac);
+    Serial.print(" ");    
+    Serial.print(id);
+    Serial.print(" ");
+    Serial.print(rssi);
+    Serial.print(" ");
+    Serial.println(transmissions);
     storeInStruct(mac, id, atoi(rssi), atoi(transmissions));
   } 
   else {

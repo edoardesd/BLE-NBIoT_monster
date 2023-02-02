@@ -19,7 +19,6 @@ void checkConnectionNBIOT() {
 
 void checkOkNBIOT(){
     if (strstr(outputNBIOT.c_str(), SUCCESS_NBIOT_TAG)) {
-      // Serial.println("Operation done, go with the next one");
       okNBIOTList++;
     }
 }
@@ -27,7 +26,7 @@ void checkOkNBIOT(){
 void onSendNBIOT(){
   wakeState = false;
   totalTransmissions++;
-  Serial.println(totalTransmissions);
+  // Serial.println(totalTransmissions);
   if(strlen(forwardPayload) > 1){
     forwardState = true;
   } else {
@@ -50,7 +49,6 @@ void prepareConnBLE(){
 
 void checkRSSI() {
   if (strstr(outputNBIOT.c_str(), "RSRQ")) {
-    char current_rsrq[4] = "";
     strcpy(current_rsrq, strremove(strremove(outputNBIOT.c_str(), "\"RSRQ\",-"), "\r"));
     current_rsrq[4] = '\0';
     #ifdef NONBMODULE  

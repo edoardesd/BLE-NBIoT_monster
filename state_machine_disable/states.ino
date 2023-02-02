@@ -13,16 +13,15 @@ void resetInterfaces() {
 }
 
 void setupNBIoTConnection() {
-  #ifdef NONBMODULE  
-    Serial.println(F("NB stp skip")); 
-    okNBIOTList = NUM_SETUPOPERATIONS_NBIOT + 2;
-  #endif
+  // #ifdef NONBMODULE  
+  //   Serial.println(F("NB stp skip")); 
+  //   okNBIOTList = NUM_SETUPOPERATIONS_NBIOT + 2;
+  // #endif
 
   if (nbIoToldState != okNBIOTList) {
     if (okNBIOTList < NUM_SETUPOPERATIONS_NBIOT) {
-      cmdNBIOT = strcat(setupIoTList[okNBIOTList], "\r\n");
-      Serial.println(cmdNBIOT);
-      NBIOTSerial.write(cmdNBIOT.c_str());
+      Serial.println(setupIoTList[okNBIOTList]);
+      NBIOTSerial.write(setupIoTList[okNBIOTList]);
     }
     if (okNBIOTList == NUM_SETUPOPERATIONS_NBIOT + 1) {
       Serial.println(DGRAMcmd);
@@ -42,17 +41,11 @@ void setupNBIoTConnection() {
 void setupBlueToothConnection() {
   if (oldStateBle != bleOperationIndex) {
     if (bleOperationIndex < NUM_SETUPOPERATIONS_BLE) {  //Ordinary operations
-      cmd_ble = setupBLEList[bleOperationIndex];
-      if(strstr(cmd_ble.c_str(), "NAME")){
-
-        createName(cmd_ble.c_str());
-        // strcat(cmd_ble.c_str(), BLENAME);
-        // strcat(cmd_ble.c_str(), "-121");
-        // strcat(cmd_ble.c_str(), "-");
-        // strcat(cmd_ble.c_str(), String(totalTransmissions).c_str());
-      }
-      Serial.println(cmd_ble);
-      BLESerial.write(cmd_ble.c_str());
+      // if(strstr(setupBLEList[bleOperationIndex], "NAME")){
+      //   createName(setupBLEList[bleOperationIndex]);
+      // }
+      Serial.println(setupBLEList[bleOperationIndex]);
+      BLESerial.write(setupBLEList[bleOperationIndex]);
       oldStateBle = bleOperationIndex;
     }     
   }
@@ -65,34 +58,34 @@ void onWakeUp(){
 
 void sendNBIOT(){
   if(readyToSendNBIOT){
-    #ifndef NONBMODULE  
+    // #ifndef NONBMODULE  
       NBIOTSerial.write(TRANScmd);
-    #else
-      Serial.println(F("NB snd skpd"));
-      onSendNBIOT();
-    #endif
+    // #else
+      // Serial.println(F("NB snd skpd"));
+      // onSendNBIOT();
+    // #endif
     readyToSendNBIOT = false;
   }
-
-  
 }
 
 void forwardNBIOT(){
+  memset(payloadHex, 0, sizeof payloadHex);
   strcpy(payloadHex, forwardPayload);
   memset(forwardPayload, 0, sizeof forwardPayload);
   Serial.println(payloadHex);
   createMessage();
+  delay(200);
   Serial.println(F("Frward"));
   readyToSendNBIOT = true;
 }
 
 void onSleep(){
-  char newName[20] = "AT+NAME";
+  char newName[20];
+  strcpy(newName, "AT+NAME");
   Serial.println(newName);
   createName(newName);
   BLESerial.write(newName);
-  delay(200);
-  BLESerial.write("AT+RESET");
+  isLostConn = false;
   sleepState = false;
   forwardState = false;
 }
@@ -100,9 +93,8 @@ void onSleep(){
 void onMaster() {
   if (bleOperationIndex < NUM_MASTEROPERATIONS_BLE) {
     if (oldStateBle != bleOperationIndex) {  //master operations
-      cmd_ble = masterBLEList[bleOperationIndex];
-      Serial.println(cmd_ble);
-      BLESerial.write(cmd_ble.c_str());
+      Serial.println(masterBLEList[bleOperationIndex]);
+      BLESerial.write(masterBLEList[bleOperationIndex]);
       oldStateBle = bleOperationIndex;
     }
   }
@@ -126,9 +118,9 @@ void bleDiscLoop(){
   if(isLostConn){
     if (bleOperationIndex < NUM_DISCONNOPERATIONS_BLE) {
       if (oldStateBle != bleOperationIndex) { 
-        cmd_ble = disconnectionBLEList[bleOperationIndex];
-        Serial.println(cmd_ble);
-        BLESerial.write(cmd_ble.c_str());
+        // cmd_ble = masterBLEList[bleOperationIndex];
+        Serial.println(disconnectionBLEList[bleOperationIndex]);
+        BLESerial.write(disconnectionBLEList[bleOperationIndex]);
         oldStateBle = bleOperationIndex;
       }
     }

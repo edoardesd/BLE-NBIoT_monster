@@ -16,7 +16,7 @@ void split(char *str, char *output1, char *output2, char *output3){
         if (k == 2)
             strcpy(output3, pch);
         pch = strtok (NULL, "-");
-        i++;
+        k++;
     }
 }
 
@@ -41,6 +41,9 @@ struct BleDevice devices_record[5];
 void readStruct(){
     for (i = 0; i < dev_index; i++){
         Serial.println(devices_record[i].dev_mac);
+        Serial.println(devices_record[i].dev_id);
+        Serial.println(devices_record[i].dev_rssi);
+        Serial.println(devices_record[i].dev_transmissions);
     }
 }
 
@@ -53,7 +56,7 @@ uint8_t selectDevice(){
     int min_score = 900;
     for(i = 0; i<dev_index; i++){
         if(getScore(devices_record[i].dev_rssi, devices_record[i].dev_transmissions) < min_score){
-            if (devices_record[i].dev_transmissions < 50){
+            if (devices_record[i].dev_transmissions < 70){
                 selectedDevice = i;
                 min_score = getScore(devices_record[i].dev_rssi, devices_record[i].dev_transmissions);
             }
@@ -79,7 +82,7 @@ void storeInStruct(char *curr_mac, char* curr_id, uint8_t curr_rssi, uint8_t cur
 bool check_known_mac(char *current_mac){
     for (i = 0; i < 3; i++){
         if (strstr(known_mac[i], current_mac)){
-            // Serial.println("known");
+            Serial.println("known");
             return true;
         }
     }
@@ -100,7 +103,7 @@ bool getMac(char *line, char *current_mac){
 bool getName(char *line, char *current_name){
     if(strstr(line, "OK+NAME")){
         getString(line, current_name, 10);
-        // Serial.println(current_name);
+        Serial.println(current_name);
         return true; 
     } else {
         return false;
