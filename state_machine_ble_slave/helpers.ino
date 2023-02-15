@@ -40,14 +40,6 @@ char *strremove(char *str, const char *sub) {
     return str;
 }
 
-void readNBIOT(){
-  if(NBIOTSerial.available()){ 
-    outputNBIOT=NBIOTSerial.readStringUntil('\n');
-    Serial.println(outputNBIOT);
-  }
-}
-
-
 void checkOkBLE(){
   if(!resetState){
     if(strstr(outputBLE.c_str(), "OK+Set")){
@@ -71,20 +63,22 @@ void checkResetBLE(){
   }
 }
 
+void checkMessageBLE(){
+  if(strstr(outputBLE.c_str(), "6d")){
+    Serial.println(F("Rqst from node"));
+    Serial.println(outputBLE.c_str());
+    isReceived = true;
+  }
+}
+
 void readBLE(){
   if (BLESerial.available()) {
-    // String outputBLE = "";
     Serial.print("HM10: ");
     
     outputBLE = BLESerial.readStringUntil('\n');
-    // prevMillis = millis();
-    // while (millis() - prevMillis < READ_TIME) {
-    //   if (BLESerial.available()) {
-    //     outputBLE += (char) BLESerial.read();
-    //   }
-    // }
     Serial.println(outputBLE);
     checkOkBLE();
     checkResetBLE();
+    checkMessageBLE();
   }  
 }

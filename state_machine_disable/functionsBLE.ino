@@ -53,6 +53,8 @@ void checkMessageBLE(){
   if(strstr(outputBLE.c_str(), "6d")){
     Serial.println(F("Rqst from node"));
     strcpy(forwardPayload, outputBLE.c_str());
+    forwardPayload[1] = '6';
+    Serial.println(forwardPayload);
   }
 }
 
@@ -65,6 +67,8 @@ bool electMAC(){
     return true;
     // mac_found = true;
   } else {
+    Serial.println(F("other MAC"));
+
     return false;
   }
 }

@@ -13,6 +13,8 @@ void setup() {
   pinMode(powerPin, OUTPUT);
   digitalWrite(powerPin, HIGH);
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(ledPin, OUTPUT);
+  pinMode(buttonPin, INPUT);
 
   Serial.begin(BAUD_RATE);
   NBIOTSerial.begin(BAUD_RATE);
@@ -27,8 +29,22 @@ void setup() {
 
 void loop() {
   readSerial();
-  readBLE();
   readNBIOT();
+  // if (!strstr(stateMachine.ActiveStateName(), "WAKE") || !strstr(stateMachine.ActiveStateName(), "NB_FWD")){
+    readBLE();
+  // }
+
+
+  forceNBIOT = digitalRead(buttonPin);
+  if(forceNBIOT) {
+    digitalWrite(ledPin, LOW);
+  } else {
+    digitalWrite(ledPin, HIGH);
+  }
+  if(oldForceNBIOT != forceNBIOT){
+    forceNBIOT ? Serial.println(F("WARN: no NBIoT")) : Serial.println(F("WARN: actv NBIoT"));
+    oldForceNBIOT = forceNBIOT;
+  }
 
   if (stateMachine.Update()) {
     Serial.print(F("St: "));

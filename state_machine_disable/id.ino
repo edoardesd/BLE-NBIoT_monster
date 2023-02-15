@@ -7,7 +7,7 @@ void setupId(){
     strcpy(MAC_TO_CONNECT, "94A9A83B7B35");
     getConnectString();
     SLEEP_TIME = 18000;
-    forceNBIOT = true;
+    forceNBIOT = false;
   }
   if(UniqueID[8] == 22){
     Serial.println(F("Sn N"));

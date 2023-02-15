@@ -9,6 +9,7 @@
 #define NUM_SETUPOPERATIONS_BLE 4
 #define NUM_MASTEROPERATIONS_BLE 2
 
+const int ledPin = 11;   
 const char *BLE_TAG = "BLE+";
 const char *NBIOT_TAG = "NB+";
 const char *RESET_NBIOT_TAG = "UFOTAS";
@@ -27,7 +28,7 @@ String outputBLE;
 int okNBIOTList = 0;
 int bleOperationIndex = 0;
 int oldStateBle = -1;
-String setupBLEList[NUM_SETUPOPERATIONS_BLE] = {"AT+IMME0", "AT+ROLE0", "AT+NAMEm3-198-23", "AT+RESET"};
+String setupBLEList[NUM_SETUPOPERATIONS_BLE] = {"AT+IMME0", "AT+ROLE0", "AT+NAMEm3-138-1", "AT+RESET"};
 String masterBLEList[NUM_MASTEROPERATIONS_BLE] = {"AT+IMME1", "AT+ROLE1"};
 String cmd_ble;
 
@@ -48,6 +49,8 @@ bool setupNBIOTState = false;
 bool transmissionState = false;
 bool bleMasterState = false;
 bool bleAdvState = false;
+
+bool isReceived = true;
 
 void setupStateMachine() {
   stateMachine.AddState(stateName[INIT], nullptr, nullptr, onExit);
@@ -82,6 +85,11 @@ void loop() {
   readSerial();
   readBLE();
   
+  if(isReceived) {
+    digitalWrite(ledPin, HIGH);
+  } else {
+    digitalWrite(ledPin, LOW);
+  }
 
   if(stateMachine.Update()){
     Serial.print(F("Active state: "));

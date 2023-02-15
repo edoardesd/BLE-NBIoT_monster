@@ -7,8 +7,11 @@
 #define NUM_DISCONNOPERATIONS_BLE 3
 #define CONNECTION_TIME 3000
 #define RSRQ_THRESHOLD 250
+const int buttonPin = 2;  
+const int ledPin = 12;   
 
-bool forceNBIOT = true;
+bool forceNBIOT = false;
+bool oldForceNBIOT = false;
 
 int SLEEP_TIME = 25000;
 
@@ -33,7 +36,7 @@ char payloadHex[22];
 char forwardPayload[22];
 char MAC_TO_CONNECT[13];
 uint8_t idDatagram = 0;
-uint8_t totalTransmissions = 1;
+uint8_t totalTransmissions = 31;
 char current_rsrq[4] = "180";
 char connectCMD[19] = "AT+CON";
 
