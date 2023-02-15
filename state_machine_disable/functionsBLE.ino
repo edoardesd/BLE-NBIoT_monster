@@ -53,25 +53,35 @@ void checkMessageBLE(){
   if(strstr(outputBLE.c_str(), "6d")){
     Serial.println(F("Rqst from node"));
     strcpy(forwardPayload, outputBLE.c_str());
-    forwardPayload[1] = '6';
-    Serial.println(forwardPayload);
   }
+}
+
+void getConnectString(char *mac){
+  strcat(connectCMD, connectTAG);
+  strcat(connectCMD, mac);
+  connectCMD[18] = '\0';
 }
 
 bool electMAC(){
-  strcpy(designatedMAC, devices_record[selectDevice()].dev_mac);
-  dev_index = 0;
-
-  if(strstr(designatedMAC, MAC_TO_CONNECT)){
+  uint8_t device = selectDevice();
+  if (device < 9){
+    // strcpy(designatedMAC, devices_record[device].dev_mac);
+    dev_index = 0;
     Serial.println(F("MAC fnd"));
-    return true;
-    // mac_found = true;
-  } else {
-    Serial.println(F("other MAC"));
+    getConnectString(devices_record[device].dev_mac);
 
-    return false;
+    return true;
+  } 
+  return false;
+  
+
+  // if(strstr(designatedMAC, MAC_TO_CONNECT)){
+   
+    // mac_found = true;
+  // } else {
+    // Serial.println(F("Other mac"));
+    // return false;
   }
-}
 
 void checkDiscovery(){
   if(strstr(outputBLE.c_str(), "OK+DISCE")){
@@ -81,6 +91,7 @@ void checkDiscovery(){
     if(electMAC()){
       Serial.println(connectCMD);
       BLESerial.write(connectCMD);
+      connectCMD[0] = '\0';
       // mac_found = false;
     }else{
       Serial.println(F("WARN no Mac "));

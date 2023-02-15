@@ -29,11 +29,8 @@ void setup() {
 
 void loop() {
   readSerial();
+  readBLE();
   readNBIOT();
-  // if (!strstr(stateMachine.ActiveStateName(), "WAKE") || !strstr(stateMachine.ActiveStateName(), "NB_FWD")){
-    readBLE();
-  // }
-
 
   forceNBIOT = digitalRead(buttonPin);
   if(forceNBIOT) {

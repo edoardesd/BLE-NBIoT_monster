@@ -67,6 +67,7 @@ void checkMessageBLE(){
   if(strstr(outputBLE.c_str(), "6d")){
     Serial.println(F("Rqst from node"));
     Serial.println(outputBLE.c_str());
+    time_now = millis();
     isReceived = true;
   }
 }

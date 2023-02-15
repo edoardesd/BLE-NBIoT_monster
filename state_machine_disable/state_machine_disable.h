@@ -38,7 +38,8 @@ char MAC_TO_CONNECT[13];
 uint8_t idDatagram = 0;
 uint8_t totalTransmissions = 31;
 char current_rsrq[4] = "180";
-char connectCMD[19] = "AT+CON";
+char connectTAG[7] = "AT+CON";
+char connectCMD[19] = "";
 
 
 const char*  setupIoTList[NUM_SETUPOPERATIONS_NBIOT] = { "AT+CMEE=1\r\n", "AT+CFUN=1\r\n", "AT+CGDCONT=1,\"IP\",\"nb.inetd.gdsp\"\r\n", "AT+CEREG=2\r\n", "AT+COPS=1,2,\"22210\"\r\n" };

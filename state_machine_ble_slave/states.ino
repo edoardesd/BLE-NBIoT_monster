@@ -18,6 +18,13 @@ void bleAdvertisement() {
   // reset states for master list oprations
   oldStateBle = -1;
   bleOperationIndex = 0;
+
+  if(isReceived){
+    if(millis() > time_now + period){
+      Serial.println("reset timer");
+      isReceived = false;
+    }
+  }
 }
 
 void setupBlueToothConnection() {

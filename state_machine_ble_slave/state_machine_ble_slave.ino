@@ -9,7 +9,7 @@
 #define NUM_SETUPOPERATIONS_BLE 4
 #define NUM_MASTEROPERATIONS_BLE 2
 
-const int ledPin = 11;   
+const int ledPin = 12;   
 const char *BLE_TAG = "BLE+";
 const char *NBIOT_TAG = "NB+";
 const char *RESET_NBIOT_TAG = "UFOTAS";
@@ -20,6 +20,8 @@ const int BLUETOOTH_RX = 8;
 const int READ_TIME = 500; //ms
 
 unsigned long prevMillis;
+int period = 6000;
+unsigned long time_now = 0;
 
 SoftwareSerial BLESerial(BLUETOOTH_RX, BLUETOOTH_TX);
 
@@ -50,7 +52,7 @@ bool transmissionState = false;
 bool bleMasterState = false;
 bool bleAdvState = false;
 
-bool isReceived = true;
+bool isReceived = false;
 
 void setupStateMachine() {
   stateMachine.AddState(stateName[INIT], nullptr, nullptr, onExit);

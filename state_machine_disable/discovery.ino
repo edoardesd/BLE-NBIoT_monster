@@ -27,7 +27,7 @@ bool read_next = false;
 char id[3];
 char rssi[4];
 char transmissions[4];
-char designatedMAC[13];
+// char designatedMAC[13];
 
 struct BleDevice{
     char dev_mac[13];
