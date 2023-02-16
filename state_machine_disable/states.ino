@@ -53,12 +53,15 @@ void setupBlueToothConnection() {
 
 void onWakeUp(){
   wakeState = true;
-  NBIOTSerial.write(STATScmd);
+  Serial.println(F("READ RSRQ"));
+  setupDatagram();
+  // NBIOTSerial.write(STATScmd);
 }
 
 void sendNBIOT(){
   if(readyToSendNBIOT){
     // #ifndef NONBMODULE  
+      Serial.println(TRANScmd);
       NBIOTSerial.write(TRANScmd);
     // #else
       // Serial.println(F("NB snd skpd"));

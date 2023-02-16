@@ -30,7 +30,7 @@ uint8_t j = 0;
 /*****  *****/ 
 char mac[13];
 char BLENAME[3];
-char TRANScmd[50] = "";
+char TRANScmd[65] = "";
 char payload[15] = "";
 char payloadHex[22];
 char forwardPayload[22];

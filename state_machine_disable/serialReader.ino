@@ -51,7 +51,7 @@ void readNBIOT() {
 
     if(strstr(stateMachine.ActiveStateName(), "WAKE") || 
        strstr(stateMachine.ActiveStateName(), "NB_FWD")){
-      checkRSSI();
+      // checkRSSI();
       checkSendNBIOT();
     }
   }

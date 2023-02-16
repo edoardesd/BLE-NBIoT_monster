@@ -47,32 +47,24 @@ void prepareConnBLE(){
 }
 
 
-void checkRSSI() {
-  if (strstr(outputNBIOT.c_str(), "RSRQ")) {
-    strcpy(current_rsrq, strremove(strremove(outputNBIOT.c_str(), "\"RSRQ\",-"), "\r"));
-    current_rsrq[4] = '\0';
-    #ifdef NONBMODULE  
-      Serial.println(F("RSSI skp")); 
-      strcpy(current_rsrq, "129");
-    #endif
-    uint8_t rsrqInt = atoi(current_rsrq);  // convert rsrq in int 
-    Serial.println(rsrqInt);
-    createPayload(current_rsrq);
-    createHexPayload();
-    createMessage();
+void setupDatagram() {
+  strcpy(current_rsrq, "167");
+  current_rsrq[4] = '\0';
+  #ifdef NONBMODULE  
+    Serial.println(F("RSSI skp")); 
+    strcpy(current_rsrq, "129");
+  #endif
+  uint8_t rsrqInt = atoi(current_rsrq);  // convert rsrq in int 
+  createPayload(current_rsrq);
+  createHexPayload();
+  createMessage();
 
-    if(forceNBIOT){
-      prepareConnBLE();
-    } 
-    if(!forceNBIOT){
-      if (rsrqInt < RSRQ_THRESHOLD && rsrqInt > 0){  
-        Serial.println(F("Ready to snd"));
-        readyToSendNBIOT = true;
-      } else {
-        prepareConnBLE();
-      }
-    }
-}
+  if(!forceNBIOT){
+    Serial.println(F("Ready to snd"));
+    readyToSendNBIOT = true;
+  } else {
+    prepareConnBLE();
+  }
 }
 
 void createPayload(char *rsrq){
@@ -103,5 +95,4 @@ void createMessage() {
   strcat(TRANScmd, payloadHex);
   strcat(TRANScmd, "\"\r\n");
   Serial.println(TRANScmd);
-  // memset(payloadHex, 0, sizeof payloadHex);
 }

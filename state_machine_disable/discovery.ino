@@ -40,9 +40,9 @@ struct BleDevice devices_record[5];
 
 void readStruct(){
     for (i = 0; i < dev_index; i++){
-        Serial.println(devices_record[i].dev_mac);
-        Serial.println(devices_record[i].dev_id);
-        Serial.println(devices_record[i].dev_rssi);
+        Serial.print(devices_record[i].dev_mac);
+        Serial.print(devices_record[i].dev_id);
+        Serial.print(devices_record[i].dev_rssi);
         Serial.println(devices_record[i].dev_transmissions);
     }
 }

@@ -73,15 +73,7 @@ bool electMAC(){
     return true;
   } 
   return false;
-  
-
-  // if(strstr(designatedMAC, MAC_TO_CONNECT)){
-   
-    // mac_found = true;
-  // } else {
-    // Serial.println(F("Other mac"));
-    // return false;
-  }
+}
 
 void checkDiscovery(){
   if(strstr(outputBLE.c_str(), "OK+DISCE")){
@@ -92,6 +84,10 @@ void checkDiscovery(){
       Serial.println(connectCMD);
       BLESerial.write(connectCMD);
       connectCMD[0] = '\0';
+      memset(connectCMD, 0, sizeof connectCMD);
+      Serial.print(F("connect cmd: "));
+      Serial.println(connectCMD);
+
       // mac_found = false;
     }else{
       Serial.println(F("WARN no Mac "));
