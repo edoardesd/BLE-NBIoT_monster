@@ -74,7 +74,7 @@ void sendNBIOT(){
 void forwardNBIOT(){
   delay(200);
   memset(payloadHex, 0, sizeof payloadHex);
-  strcpy(payloadHex, forwardPayload);
+  strlcpy(payloadHex, forwardPayload, sizeof(payloadHex));
   memset(forwardPayload, 0, sizeof forwardPayload);
   Serial.println(payloadHex);
   delay(200);
@@ -85,10 +85,10 @@ void forwardNBIOT(){
 }
 
 void onSleep(){
-  char newName[20];
-  strcpy(newName, "AT+NAME");
-  Serial.println(newName);
-  createName(newName);
+  uint8_t nameLen = 20;
+  char newName[nameLen];
+  strlcpy(newName, "AT+NAME", sizeof(newName));
+  createName(newName, nameLen);
   BLESerial.write(newName);
   isLostConn = false;
   sleepState = false;
@@ -135,6 +135,7 @@ void bleDiscLoop(){
 void bleDisc(){
   bleOperationIndex = 0;
   oldStateBle = -1;
+  dev_index = 0;
   connectedState = false;
   // disconnectedState = false;
   Serial.println(F("Disc"));

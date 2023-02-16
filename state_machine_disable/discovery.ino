@@ -2,32 +2,30 @@
 #define BETA 3
 
 
-void split(char *str, char *output1, char *output2, char *output3){
-    char * pch;
-    uint8_t k = 0;
-    // Serial.println("Splitting string  into tokens:");
-    pch = strtok (str,"-");
-    while (pch != NULL)
-    {
-        if (k == 0)
-            strcpy(output1, pch);
-        if (k == 1)
-            strcpy(output2, pch);
-        if (k == 2)
-            strcpy(output3, pch);
-        pch = strtok (NULL, "-");
-        k++;
-    }
-}
-
-
 const char *known_mac[] = {"A06C65CF8E11", "94A9A83B7B35", "A06C65CF7F9C"};
 int dev_index = 0;
 bool read_next = false;
 char id[3];
 char rssi[4];
 char transmissions[4];
-// char designatedMAC[13];
+
+void split(char *str, char *output1, char *output2, char *output3){
+    char * pch;
+    uint8_t k = 0;
+    pch = strtok (str,"-");
+    while (pch != NULL)
+    {
+        if (k == 0)
+            strlcpy(output1, pch, sizeof(id));
+        if (k == 1)
+            strlcpy(output2, pch, sizeof(rssi));
+        if (k == 2)
+            strlcpy(output3, pch, sizeof(transmissions));
+        pch = strtok (NULL, "-");
+        k++;
+    }
+}
+
 
 struct BleDevice{
     char dev_mac[13];
@@ -56,10 +54,10 @@ uint8_t selectDevice(){
     int min_score = 900;
     for(i = 0; i<dev_index; i++){
         if(getScore(devices_record[i].dev_rssi, devices_record[i].dev_transmissions) < min_score){
-            if (devices_record[i].dev_transmissions < 70){
-                selectedDevice = i;
-                min_score = getScore(devices_record[i].dev_rssi, devices_record[i].dev_transmissions);
-            }
+            // if (devices_record[i].dev_transmissions < 70){
+            selectedDevice = i;
+            min_score = getScore(devices_record[i].dev_rssi, devices_record[i].dev_transmissions);
+            // }
         }
     }
     Serial.println(selectedDevice);
@@ -68,8 +66,8 @@ uint8_t selectDevice(){
 
 void storeInStruct(char *curr_mac, char* curr_id, uint8_t curr_rssi, uint8_t curr_transmission){    
     // Serial.println(curr_mac);
-    strcpy(devices_record[dev_index].dev_mac, curr_mac);
-    strcpy(devices_record[dev_index].dev_id, curr_id);
+    strlcpy(devices_record[dev_index].dev_mac, curr_mac, sizeof(devices_record[dev_index].dev_mac));
+    strlcpy(devices_record[dev_index].dev_id, curr_id, sizeof(devices_record[dev_index].dev_id));
     devices_record[dev_index].dev_rssi = curr_rssi;
     devices_record[dev_index].dev_transmissions = curr_transmission;
 
@@ -80,7 +78,6 @@ void storeInStruct(char *curr_mac, char* curr_id, uint8_t curr_rssi, uint8_t cur
 bool check_known_mac(char *current_mac){
     for (i = 0; i < 3; i++){
         if (strstr(known_mac[i], current_mac)){
-            Serial.println("known");
             return true;
         }
     }

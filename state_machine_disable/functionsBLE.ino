@@ -52,23 +52,23 @@ void checkResetBLE(){
 void checkMessageBLE(){
   if(strstr(outputBLE.c_str(), "6d")){
     Serial.println(F("Rqst from node"));
-    strcpy(forwardPayload, outputBLE.c_str());
+    strlcpy(forwardPayload, outputBLE.c_str(), sizeof(forwardPayload));
     forwardPayload[1] = '6';
-    Serial.println(forwardPayload);
+    // Serial.println(forwardPayload);
   }
 }
 
 void getConnectString(char *mac){
-  strcat(connectCMD, CONNECT_TAG);
-  strcat(connectCMD, mac);
-  connectCMD[18] = '\0';
+  strlcat(connectCMD, CONNECT_TAG, sizeof(connectCMD));
+  strlcat(connectCMD, mac, sizeof(connectCMD));
+  // connectCMD[18] = '\0';
 }
 
 bool electMAC(){
   uint8_t device = selectDevice();
   if (device < 9){
     // strcpy(designatedMAC, devices_record[device].dev_mac);
-    dev_index = 0;
+    // dev_index = 0;
     Serial.println(F("MAC fnd"));
     getConnectString(devices_record[device].dev_mac);
 
@@ -80,12 +80,13 @@ bool electMAC(){
 void checkDiscovery(){
   if(strstr(outputBLE.c_str(), "OK+DISCE")){
     readStruct();
+    
     // electMAC();
     
     if(electMAC()){
       Serial.println(connectCMD);
       BLESerial.write(connectCMD);
-      connectCMD[0] = '\0';
+      // connectCMD[0] = '\0';
       memset(connectCMD, 0, sizeof connectCMD);
       // Serial.print(F("connect cmd: "));
       // Serial.println(connectCMD);
@@ -115,18 +116,6 @@ void checkDiscovery(){
   else {
     read_next = getMac((char*)outputBLE.c_str(), mac);
   }
-  // if(strstr(outputBLE.c_str(), "OK+DISC") || std::strstr(line, "OK+DIS1:")){
-  //   char mac[13];
-  //   char *mac_start = strchr(outputBLE.c_str(), ':');
-  //   uint8_t index = (uint8_t)(mac_start - outputBLE.c_str()+1);
-  //   strncpy(mac, &outputBLE.c_str()[index], 12);
-  //   mac[12]='\0';
-
-  //   if(strstr(mac, MAC_TO_CONNECT)){
-  //     Serial.println(F("MAC fnd"));
-  //     mac_found = true;
-  //   }
-  // }
 
 }
 

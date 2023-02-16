@@ -50,37 +50,39 @@ char *strremove(char *str, const char *sub) {
     return str;
 }
 
-String createIdDatagram(){
-  String stringIdDatagram;
-  char strId[4];
+void createIdDatagram(char *strId){
+  // String stringIdDatagram;
+  // char strId[4];
 
   if (idDatagram < 10) {
     sprintf(strId,"00%d",idDatagram);
-    strcat(stringIdDatagram.c_str(), strId);
+    // strlcat(stringIdDatagram.c_str(), id, 4);
   }
   if (idDatagram >= 10 && idDatagram < 100) {
     sprintf(strId,"0%d",idDatagram);
-    strcat(stringIdDatagram.c_str(), strId);
+    // strlcat(stringIdDatagram.c_str(), strId, 4);
   }
   if (idDatagram >= 100 && idDatagram < 1000) {
-    strcat(stringIdDatagram.c_str(), strId);
+    sprintf(strId,"%d",idDatagram);
+    // strlcat(stringIdDatagram.c_str(), strId, 4);
   }
   if (idDatagram >= 1000){
-    strcpy(stringIdDatagram.c_str(), "999");
+    strlcpy(strId, "999", 4);
     idDatagram = 0;
   }
+  // Serial.println(strId);
   idDatagram++;
-  return stringIdDatagram;
+  // return stringIdDatagram;
 }
 
-void createName(char *name){
+void createName(char *name, uint8_t len){
   char strTrans[4];
-  strcat(name, BLENAME);
-  strcat(name, "-");
-  strcat(name, current_rsrq);
-  strcat(name, "-");
+  strlcat(name, BLENAME, len);
+  strlcat(name, "-", len);
+  strlcat(name, current_rsrq, len);
+  strlcat(name, "-", len);
   sprintf(strTrans,"%d",totalTransmissions);
-  strcat(name, strTrans);
-  name[19] = '\0'; 
+  strlcat(name, strTrans, len);
+  // name[19] = '\0'; 
   Serial.println(name);
 }

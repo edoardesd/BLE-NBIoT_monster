@@ -48,13 +48,12 @@ void prepareConnBLE(){
 
 
 void setupDatagram() {
-  strcpy(current_rsrq, "167");
-  current_rsrq[4] = '\0';
+  strlcpy(current_rsrq, "167", sizeof(current_rsrq));
   #ifdef NONBMODULE  
     Serial.println(F("RSSI skp")); 
     strcpy(current_rsrq, "129");
   #endif
-  uint8_t rsrqInt = atoi(current_rsrq);  // convert rsrq in int 
+  // uint8_t rsrqInt = atoi(current_rsrq);  // convert rsrq in int 
   createPayload(current_rsrq);
   createHexPayload();
   createMessage();
@@ -69,12 +68,15 @@ void setupDatagram() {
 
 void createPayload(char *rsrq){
   memset(payload, 0, sizeof payload);
-  String idDatagram = createIdDatagram();
-  strcat(payload, BLENAME);
-  strcat(payload, "A");
-  strcat(payload, idDatagram.c_str());
-  strcat(payload, "A");
-  strcat(payload, rsrq);
+  char idDatagram[4];
+  createIdDatagram(idDatagram);
+  // String idDatagram = createIdDatagram();
+  // Serial.println(idDatagram);
+  strlcat(payload, BLENAME, sizeof(payload));
+  strlcat(payload, "A", sizeof(payload));
+  strlcat(payload, idDatagram, sizeof(payload));
+  strlcat(payload, "A", sizeof(payload));
+  strlcat(payload, rsrq, sizeof(payload));
 }
 
 void createHexPayload(){
@@ -83,16 +85,28 @@ void createHexPayload(){
   for (i = 0, j = 0; i < payloadLen; ++i, j += 2) {
     sprintf(payloadHex + j, "%02x", payload[i] & 0xff);
   }
+  // free(payloadLen);
 }
 
 void createMessage() {
   memset(TRANScmd, 0, sizeof TRANScmd);
-  char buffer[5] = "";
-  strcat(TRANScmd, FIXED_DATAGRAM);
+  char buffer[5];
+  strlcat(TRANScmd, FIXED_DATAGRAM, sizeof(TRANScmd));
   snprintf(buffer, sizeof(buffer), "%d", strlen(payloadHex)/2); 
-  strcat(TRANScmd, buffer);
-  strcat(TRANScmd, ",\"");
-  strcat(TRANScmd, payloadHex);
-  strcat(TRANScmd, "\"\r\n");
+  strlcat(TRANScmd, buffer, sizeof(TRANScmd));
+  strlcat(TRANScmd, ",\"", sizeof(TRANScmd));
+  strlcat(TRANScmd, payloadHex, sizeof(TRANScmd));
+  strlcat(TRANScmd, "\"\r\n", sizeof(TRANScmd));
   Serial.println(TRANScmd);
+}
+
+void checkErrorNBIOT(){
+  if (strstr(outputNBIOT.c_str(), "ERROR: 50")){
+    Serial.println(F("WRN: Err send"));
+    readyToSendNBIOT = false;
+    wakeState = false;
+    isLostConn = false;
+    forwardState = false;
+    sleepState = true;
+  }
 }
