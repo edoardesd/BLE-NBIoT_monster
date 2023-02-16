@@ -6,6 +6,8 @@ const PROGMEM char *const RELEASE_TAG = "YESNB";
 const PROGMEM char *const CEREG_NBIOT_TAG = "CEREG: 5";
 const PROGMEM char *const SUCCESS_NBIOT_TAG = "OK";
 const PROGMEM char *const RESET_NBIOT_TAG = "UFOTAS";
+const PROGMEM char *const CONNECT_TAG = "AT+CON";
+
 
 const PROGMEM char *const DGRAMcmd = "AT+NSOCR=\"DGRAM\",17,3365,1\r\n"; 
 const PROGMEM char *const STATScmd = "AT+NUESTATS\r\n";

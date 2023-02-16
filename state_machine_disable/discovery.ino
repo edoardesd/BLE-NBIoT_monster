@@ -69,8 +69,6 @@ uint8_t selectDevice(){
 void storeInStruct(char *curr_mac, char* curr_id, uint8_t curr_rssi, uint8_t curr_transmission){    
     // Serial.println(curr_mac);
     strcpy(devices_record[dev_index].dev_mac, curr_mac);
-    // Serial.println(devices_record[dev_index].dev_mac);
-
     strcpy(devices_record[dev_index].dev_id, curr_id);
     devices_record[dev_index].dev_rssi = curr_rssi;
     devices_record[dev_index].dev_transmissions = curr_transmission;

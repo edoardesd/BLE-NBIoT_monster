@@ -81,5 +81,6 @@ void createName(char *name){
   strcat(name, "-");
   sprintf(strTrans,"%d",totalTransmissions);
   strcat(name, strTrans);
+  name[19] = '\0'; 
   Serial.println(name);
 }

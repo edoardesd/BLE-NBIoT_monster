@@ -53,11 +53,13 @@ void checkMessageBLE(){
   if(strstr(outputBLE.c_str(), "6d")){
     Serial.println(F("Rqst from node"));
     strcpy(forwardPayload, outputBLE.c_str());
+    forwardPayload[1] = '6';
+    Serial.println(forwardPayload);
   }
 }
 
 void getConnectString(char *mac){
-  strcat(connectCMD, connectTAG);
+  strcat(connectCMD, CONNECT_TAG);
   strcat(connectCMD, mac);
   connectCMD[18] = '\0';
 }
@@ -85,8 +87,8 @@ void checkDiscovery(){
       BLESerial.write(connectCMD);
       connectCMD[0] = '\0';
       memset(connectCMD, 0, sizeof connectCMD);
-      Serial.print(F("connect cmd: "));
-      Serial.println(connectCMD);
+      // Serial.print(F("connect cmd: "));
+      // Serial.println(connectCMD);
 
       // mac_found = false;
     }else{

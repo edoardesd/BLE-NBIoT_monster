@@ -72,10 +72,12 @@ void sendNBIOT(){
 }
 
 void forwardNBIOT(){
+  delay(200);
   memset(payloadHex, 0, sizeof payloadHex);
   strcpy(payloadHex, forwardPayload);
   memset(forwardPayload, 0, sizeof forwardPayload);
   Serial.println(payloadHex);
+  delay(200);
   createMessage();
   delay(200);
   Serial.println(F("Frward"));
